@@ -1,0 +1,8 @@
+{
+  "ability" : {
+    "name" : "_Project42Neo_",
+    "type" : "project42neo",
+    "scripts" : ["/items/active/weapons/melee/abilities/project42neo/project45gunfire.lua"],
+    "class" : "Project42Neo"
+  }
+}
