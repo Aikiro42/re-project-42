@@ -11,18 +11,18 @@
   "twoHanded" : true,
   "itemTags" : ["weapon","melee","broadsword","upgradeableWeapon"],
 
-  "inventoryIcon" : "hokucide.png",
-
-  "animation" : "/items/active/weapons/melee/broadsword/combobroadsword.animation",
+  "inventoryIcon" : "project42neo-test-katana.png",
+  
   "animationParts" : {
-    "blade" : "project42-test-katana.png"
+    "melee" : "project42neo-test-katana.png"
   },
 
   "scripts" : ["/items/active/weapons/melee/project42neo-meleeweapon.lua"],
 
   "elementalType" : "fire",
 
+  "baseOffset": [0, 2],
   "primaryAbilityType" : "project42neo",
   
-  "builder" : "/items/buildscripts/buildunrandweapon.lua"
+  "builder" : "/items/buildscripts/project42neo-buildweapon.lua"
 }

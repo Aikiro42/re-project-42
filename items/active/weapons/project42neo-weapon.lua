@@ -132,6 +132,9 @@ function Weapon:setStance(stance)
   self.oldWeaponOffset = snapWeapon and self.newWeaponOffset or self.weaponOffset
   self.oldArmRotation = snapArm and self.newArmRotation or self.relativeArmRotation
   
+  -- stance.allowRotate = stance.allowRotate == nil or stance.allowRotate
+  -- stance.allowFlip = stance.allowFlip == nil or stance.allowFlip
+
   self.stance = stance
   self.stanceTransitionSpeedMult = stance.transitionSpeedMult or 4
   self.weaponOffset = self.oldWeaponOffset

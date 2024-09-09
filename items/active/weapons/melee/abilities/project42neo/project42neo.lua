@@ -13,6 +13,9 @@ function Project42Neo:init()
   
   self.defaultOffset = config.getParameter(self.offsetParameter, {0, 0})
 
+  self.idleStance.snap = true
+  self.weapon:setStance(self.idleStance)
+
 end
 
 function Project42Neo:update(dt, fireMode, shiftHeld)
@@ -35,11 +38,11 @@ function Project42Neo:update(dt, fireMode, shiftHeld)
 end
 
 function Project42Neo:canActivate()
-  return self.fireMode == (self.isPrimary and "primary" or "alt")
+  return self.fireMode == "primary"
 end
 
 function Project42Neo:cancelling()
-  return self.fireMode == (self.isPrimary and "alt" or "primary")
+  return self.fireMode == "alt"
 end
 
 function Project42Neo:slashing(comboStep)
