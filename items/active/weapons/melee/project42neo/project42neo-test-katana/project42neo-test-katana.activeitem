@@ -1,0 +1,28 @@
+{
+  "itemName" : "project42neo-test-katana",
+  "price" : 1500,
+  "level" : 4,
+  "maxStack" : 1,
+  "rarity" : "Legendary",
+  "description" : "Accidentally formed from a sword at the bottom of the ocean during a particle accelerator explosion.",
+  "shortdescription" : "Hokucide",
+  "tooltipKind" : "sword",
+  "category" : "broadsword",
+  "twoHanded" : true,
+  "itemTags" : ["weapon","melee","broadsword","upgradeableWeapon"],
+
+  "inventoryIcon" : "hokucide.png",
+
+  "animation" : "/items/active/weapons/melee/broadsword/combobroadsword.animation",
+  "animationParts" : {
+    "blade" : "project42-test-katana.png"
+  },
+
+  "scripts" : ["/items/active/weapons/melee/project42neo-meleeweapon.lua"],
+
+  "elementalType" : "fire",
+
+  "primaryAbilityType" : "project42neo",
+  
+  "builder" : "/items/buildscripts/buildunrandweapon.lua"
+}

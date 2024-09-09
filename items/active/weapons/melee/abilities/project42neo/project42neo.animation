@@ -1,0 +1,83 @@
+{
+  
+  "transformationGroups" : {
+    "swoosh" : {},
+    "weapon": {}
+  },  
+
+  "sounds":{
+    "ready": ["/sfx/interface/sniper_mark_pitch1.ogg"],
+    "fire1": ["/sfx/melee/swing_dagger.ogg"]
+  },
+
+  "animatedParts": {
+
+    "stateTypes": {
+
+      "swoosh": {
+        "default": "idle",
+        "states":{
+          "idle" : {
+          
+          },
+          "fire1" : {
+            "frames" : 3,
+            "cycle" : 0.1,
+            "mode" : "transition",
+            "transition" : "idle"
+          },
+          "fire2" : {
+            "frames" : 3,
+            "cycle" : 0.1,
+            "mode" : "transition",
+            "transition" : "idle"
+          }
+        }
+      }
+      
+    },
+    
+    "parts": {
+
+      "blade": {
+        "properties": {
+          "centered" : true,
+          "transformationGroups": ["weapon"],
+          "offset": [0, 0],
+          "image": "<partImage>"
+        }
+      },
+
+      "swoosh": {
+        
+        "properties": {
+          "zLevel" : 99,
+          "centered" : true,
+          "transformationGroups" : ["swoosh"],
+          "rotationCenter" : [0, 0]
+        },
+
+        "partStates" : {
+          "swoosh" : {
+            "idle" : {
+              "properties" : {
+                "image" : ""
+              }
+            },
+            "fire1" : {
+              "properties" : {
+                "image" : "/items/active/weapons/melee/broadsword/swoosh/physicalswoosh.png:<frame>"
+              }
+            },
+            "fire2" : {
+              "properties" : {
+                "image" : "/items/active/weapons/melee/broadsword/swoosh3/physicalswoosh.png:<frame>"
+              }
+            }
+          }   
+        }
+
+      }
+    }
+  }
+}

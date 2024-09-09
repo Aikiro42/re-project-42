@@ -1,0 +1,7 @@
+[
+  {
+    "op": "add",
+    "path": "/project42neo",
+    "value": "/items/active/weapons/melee/abilities/project42neo/project42neo.weaponability"
+  }
+]
