@@ -49,8 +49,17 @@ function build(directory, config, parameters, level, seed)
   end
 
   if config.baseOffset then
-    construct(config, "animationCustom", "animatedParts", "parts", "melee", "properties")
-    config.animationCustom.animatedParts.parts.melee.properties.offset = config.baseOffset
+
+    local swordParts = {
+      "melee",
+      "sheath"
+    }
+
+    for _, part in ipairs(swordParts) do
+      construct(config, "animationCustom", "animatedParts", "parts", part, "properties")
+      config.animationCustom.animatedParts.parts[part].properties.offset = config.baseOffset
+    end
+
   end
 
   -- populate tooltip fields

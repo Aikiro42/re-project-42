@@ -26,6 +26,8 @@ function Weapon:init()
   self.oldWeaponOffset = self.weaponOffset
   self.newWeaponOffset = self.weaponOffset
 
+  self.oldAimAngle = self.aimAngle or 0
+
 end
 
 function Weapon:update(dt, fireMode, shiftHeld)
@@ -75,8 +77,10 @@ function Weapon:updateAim()
 
   if self.stance.allowRotate then
     self.aimAngle = aimAngle
-  elseif self.stance.aimAngle then
-    self.aimAngle = self.stance.aimAngle
+    self.oldAimAngle = self.aimAngle
+    self.newAimAngle = nil
+  elseif self.newAimAngle then
+    self.aimAngle = interp[self.stanceInterpolationMethod](self.stanceProgress, self.oldAimAngle, self.newAimAngle)
   end
   activeItem.setArmAngle(self.aimAngle + self.baseArmRotation + self.recoilAmount/2)
 
@@ -132,11 +136,13 @@ function Weapon:setStance(stance)
   self.oldWeaponRotation = snapWeapon and self.newWeaponRotation or self.relativeWeaponRotation
   self.oldWeaponOffset = snapWeapon and self.newWeaponOffset or self.weaponOffset
   self.oldArmRotation = snapArm and self.newArmRotation or self.relativeArmRotation
-  
+  self.oldAimAngle = stance.snap and stance.aimAngle or self.oldAimAngle
+
   -- stance.allowRotate = stance.allowRotate == nil or stance.allowRotate
   -- stance.allowFlip = stance.allowFlip == nil or stance.allowFlip
 
   self.stance = stance
+  self.newAimAngle = stance.aimAngle
   self.stanceTransitionSpeedMult = stance.transitionSpeedMult or 4
   self.weaponOffset = self.oldWeaponOffset
 
@@ -157,6 +163,8 @@ function Weapon:setStance(stance)
     self.relativeArmRotation = self.baseArmRotation + self.recoilAmount/2
   end
 
+  animator.setPartTag("melee", "stanceDirectives", stance.weaponDirectives or "")
+  
   for stateType, state in pairs(stance.animationStates or {}) do
     animator.setAnimationState(stateType, state)
   end

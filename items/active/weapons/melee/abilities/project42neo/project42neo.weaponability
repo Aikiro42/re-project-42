@@ -3,7 +3,57 @@
   "animationCustom": {
     "sounds":{
       "fire1": ["/sfx/melee/swing_dagger.ogg"]
-    }  
+    },
+    "animatedParts": {
+
+      "stateTypes": {
+        "swoosh": {
+          "states":{
+            "verticalslash" : {
+              "frames" : 3,
+              "cycle" : 0.1,
+              "mode" : "transition",
+              "transition" : "idle"
+            },
+            "fire2" : {
+              "frames" : 3,
+              "cycle" : 0.1,
+              "mode" : "transition",
+              "transition" : "idle"
+            },
+            "castlevaniaslash" : {
+              "frames" : 3,
+              "cycle" : 0.1,
+              "mode" : "transition",
+              "transition" : "idle"
+            }
+          }
+        }
+      },
+      "parts":{
+      "swoosh": {
+          "partStates" : {
+            "swoosh" : {
+              "verticalslash" : {
+                "properties" : {
+                  "image" : "/items/active/weapons/melee/abilities/project42neo/swoosh/verticalslash.png:<frame>"
+                }
+              },
+              "fire2" : {
+                "properties" : {
+                  "image" : "/items/active/weapons/melee/broadsword/swoosh3/physicalswoosh.png:<frame>"
+                }
+              },
+              "castlevaniaslash": {
+                "properties" : {
+                  "image" : "/items/active/weapons/melee/abilities/project42neo/swoosh/castlevaniaslash.png:<frame>"
+                }
+              }
+            }   
+          }
+        }
+      }
+    }
   },
   
   "ability" : {
@@ -17,68 +67,93 @@
     "comboGracePeriod": 0.5,
     "offsetParameter": "baseOffset",
 
-    "equip": [
-      {
-        "armRotation": 0,
-        "weaponRotation": 0
-      },
-      {
-        "armRotation": 45,
-        "weaponRotation": 0,
-        "weaponAngularVelocity": 3600,
-        "allowFlip": true,
-        "allowRotate": false,
-        "playSounds": ["fire1"],
-        "duration": 0.5
-      },
-      {
-        "armRotation": -135,
-        "weaponRotation": 0,
-        "allowFlip": true,
-        "allowRotate": true,
-        "snap": true,
-        "playSounds": ["fire1"],
-        "duration": 0.5
-      }
-    ],
-
     "idle": {
-      "main": {
+      "sheathed": {
         "armRotation": -90,
+        "weaponRotation": -90,
+        "allowFlip": true,
+        "weaponOffset": [-2, 0],
+        "snap": true
+      },
+      "unsheathing": [
+        {
+          "armRotation": -90,
+          "weaponRotation": -75,
+          "allowFlip": true,
+          "weaponOffset": [-2.5, 0],
+          "duration": 0.1,
+          "twoHanded": true,
+          "snap": true
+        },
+        {
+          "armRotation": 45,
+          "weaponRotation": -45,
+          "weaponOffset": [-1.25, 0],
+          "allowFlip": true,
+          "allowRotate": false,
+          "duration": 0.1,
+          "twoHanded": false,
+          "weaponDirectives": "?flipy"
+        },
+        {
+          "armRotation": 45,
+          "weaponRotation": 90,
+          "weaponOffset": [-0.5, 0],
+          "allowFlip": true,
+          "allowRotate": false,
+          "duration": 0.1,
+          "twoHanded": false
+        },
+        {
+          "armRotation": -45,
+          "weaponRotation": 90,
+          "allowFlip": true,
+          "allowRotate": true,
+          "duration": 0.1,
+          "twoHanded": true
+        }  
+      ],
+      "sheathing": [
+
+      ],
+      "ready": {
+        "armRotation": -45,
         "weaponRotation": 90,
         "allowFlip": true,
         "allowRotate": false,
+        "twoHanded": true,
         "aimAngle": 0
-      },
-      "timeout": 10,
-      "sequence": []
+      }
     },
 
     "combo": {
+      /*
+      "attackName": {
+        "sequence": [],
+        "next": {
+          "default": "nextAttack"
+        }
+      }
+      */
       "init": {
         "sequence": [
-          ///*
           {
             "armRotation": 90,
-            "weaponRotation": 90,
-            // "armRotation": 0,
-            // "weaponRotation": 0,
-            
+            "weaponRotation": 90,            
             "twoHanded": true,
+            //"allowRotate": true,
             "duration": 0.2
           },
-          //*/
           {
-            "armRotation": -35,
-            "weaponRotation": -15,
-            // "armRotation": 0,
-            // "weaponRotation": 0,
-    
+            "armRotation": -45,
+            "weaponRotation": 0,
             "twoHanded": true,
             "snap": true,
             "duration": 0.1,
+            "aimAngle": 0,
+
             "animationStates": {
-              "swoosh": "fire1"
+              "swoosh": "verticalslash"
             },
             "playSounds": ["fire1"],
             "damage": {
@@ -91,40 +166,20 @@
                 "timeout": 0.1
               },
               "area": [[-5, 2], [-2.5, 3], [1, 3], [4, 1.75], [5, -0.25], [5, -2.25], [4, -3.25], [0, -2.5]],
-              "offset": [-2, 0],
-              "rotation": 45
+              "offset": [0, 1.25],
+              "rotation": -45
             }
           },
           {
             "armRotation": -45,
             "weaponRotation": 45,
             "twoHanded": true,
-            "allowRotate": true,
             "allowFlip": true
           }
         ],
 
         "next": {
-          
-          "default": "normal2",
-          
-          "crouching": {
-            "side": "normal2",
-            "top": "normal2",
-            "bottom": "normal2"
-          },
-          
-          "standing":{
-            "side": "normal2",
-            "top": "normal2",
-            "bottom": "normal2"
-          },
-          
-          "falling":{
-            "side": "normal2",
-            "top": "normal2",
-            "bottom": "normal2"
-          }
+          "default": "normal2"
         }
       },
       "normal2": {
@@ -141,13 +196,13 @@
           {
             "armRotation": 0,
             "weaponRotation": 0,
-            "weaponOffset": [0, 0],
-            // "armRotation": 0,
-            // "weaponRotation": 0,
-    
+            "weaponOffset": [0, 0],    
             "twoHanded": true,
             "snap": true,
             "duration": 0.1,
+            "aimAngle": 0,
+              
+
             "animationStates": {
               "swoosh": "fire2"
             },
@@ -163,31 +218,66 @@
               "area": [[-4.75, 1.5], [3, 1], [3, -1], [-4.75, -1.5]],
               "offset": [0, 0]
             }
+          },
+          {
+            "armRotation": 0,
+            "weaponRotation": 0,
+            "allowRotate": false
           }
         ],
 
         "next": {
-          
-          "default": "init",
-          
-          "crouching": {
-            "side": "init",
-            "top": "init",
-            "bottom": "init"
-          },
-          
-          "standing":{
-            "side": "init",
-            "top": "init",
-            "bottom": "init"
-          },
-          
-          "falling":{
-            "side": "init",
-            "top": "init",
-            "bottom": "init"
-          }
+          "default": "castlevaniaslash"
         }
+      },
+      
+      "castlevaniaslash": {
+        "sequence": [
+            {
+              "allowRotate": true,
+              "allowFlip": true,
+              "twoHanded": false,
+              "weaponRotation": 90,
+              "armRotation": 90,
+              "duration": 0.2
+          },
+          {
+              "allowRotate": false,
+              "allowFlip": false,
+              "twoHanded": false,
+              "snap": true,
+              "weaponRotation": 0,
+              "armRotation": -135,
+              "duration": 0.1,
+              "aimAngle": 0,
+              
+              "animationStates": {
+                "swoosh": "castlevaniaslash"
+              },
+              "playSounds": ["fire1"],  
+              "damage": {
+                "config": {
+                  "damageSourceKind" : "dagger",
+                  "statusEffects" : [ ],
+                  "knockbackMode" : "facing",
+                  "knockback" : 0,
+                  "timeout": 0.1
+                },
+                "area" : [
+                  [0.375, 0.9375],
+                  [1.875, 0.9375],
+                  [6.75, 0.0625],
+                  [3.5, -0.6875],
+                  [-6.0, -0.8125],
+                  [-6.875, -0.6875],
+                  [-0.25, -0.1875],
+                  [2.125, 0.1875]
+                ],
+                "offset": [0, 0],
+                "rotation": 0
+              }  
+          }
+        ]
       }
     }
   }

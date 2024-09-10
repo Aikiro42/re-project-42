@@ -12,7 +12,7 @@ function init()
   self.weapon = Weapon:new()
 
   self.weapon:addTransformationGroup("weapon", {0,0}, util.toRadians(config.getParameter("baseWeaponRotation", 0)))
-  -- self.weapon:addTransformationGroup("swoosh", {0,0}, math.pi/2)
+  -- self.weapon:addTransformationGroup("swoosh", {0,0}, util.toRadians(config.getParameter("baseWeaponRotation", 0)))
 
   local primaryAbility = getPrimaryAbility()
   self.weapon:addAbility(primaryAbility)

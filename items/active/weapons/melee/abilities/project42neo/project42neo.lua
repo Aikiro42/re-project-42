@@ -12,24 +12,17 @@ function Project42Neo:init()
 
   -- timers
   self.cooldownTimer = self.cooldown
-  self.idleTimer = self.idle.timeout
+  self.idleTimer = 0
 
-  self:setState(self.equipping)
+  animator.setAnimationState("sheath", "sheathed")
+  self.weapon:setStance(self.idle.sheathed)
 
 end
 
 function Project42Neo:update(dt, fireMode, shiftHeld)
 
   WeaponAbility.update(self, dt, fireMode, shiftHeld)
-
-  --[[
-  self.idleTimer = math.max(0, self.idleTimer - self.dt)
-  if self.idleTimer <= 0 then
-    self:setState(self.idling)
-    self.idleTimer = self.stances.idle.timeout
-  end
-  --]]
-
+  
   self.cooldownTimer = math.max(0, self.cooldownTimer - self.dt)
 
   if self.cooldownTimer <= 0
@@ -37,7 +30,11 @@ function Project42Neo:update(dt, fireMode, shiftHeld)
   and not self.isAttacking
   and self:triggering()
   then
-    self:setState(self.attacking, "init")
+    if animator.animationState("sheath") == "sheathed" then
+      self:setState(self.unsheathing)
+    else
+      self:setState(self.attacking, "init")
+    end
   end
 
 end
@@ -59,9 +56,16 @@ end
 
 -- states
 
-function Project42Neo:equipping()
-  self:setStanceSequence(self.equip)
-  self.weapon:setStance(self.idle.main)  
+function Project42Neo:unsheathing()
+  self:setStanceSequence(self.idle.unsheathing)
+  self.weapon:setStance(self.idle.ready)
+  animator.setAnimationState("sheath", "unsheathed")
+end
+
+function Project42Neo:sheathing()
+  self:setStanceSequence(self.idle.sheathing)
+  self.weapon:setStance(self.idle.sheathed)
+  animator.setAnimationState("sheath", "sheathed")
 end
 
 function Project42Neo:idling()
@@ -69,22 +73,15 @@ function Project42Neo:idling()
 end
 
 function Project42Neo:attacking(attack)
-    
-  for i, stance in ipairs(self.combo[attack].sequence) do
-    
-    self.weapon:setStance(stance)
-    self:damage(stance.damage, stance.weaponRotation)
-    self:shield(stance.shield, stance.weaponRotation)
-    util.wait(stance.duration or 0)
-    coroutine.yield()
-
-  end
+  
+  self:setStanceSequence(self.combo[attack].sequence)
   
   local gracePeriod = self.comboGracePeriod 
   while gracePeriod > 0 do
     gracePeriod = gracePeriod - self.dt
     if self:triggering() then
-      self:setState(self.attacking, self.combo[attack].next.default)
+      local nextAttack = (self.combo[attack].next or {}).default or "init"
+      self:setState(self.attacking, nextAttack)
       return
     elseif self:cancelling() then
       break
@@ -99,7 +96,7 @@ end
 
 function Project42Neo:resetting(attack)
   self:setStanceSequence(self.combo[attack].resetSequence)
-  self.weapon:setStance(self.idle.main)
+  self.weapon:setStance(self.idle.ready)
   self.isAttacking = false
 end
 
@@ -110,14 +107,19 @@ function Project42Neo:setStanceSequence(stanceSequence)
   if #stanceSequence == 0 then return end
   for i, stance in ipairs(stanceSequence) do
     self.weapon:setStance(stance)
+    self:damage(stance)
+    self:shield(stance.shield, -stance.armRotation - stance.weaponRotation)
     util.wait(stance.duration or 0)
+    coroutine.yield()
   end
 end
 
-function Project42Neo:damage(damageParameters, weaponRotation)
-  if not damageParameters
-  or not weaponRotation
-  then return end
+function Project42Neo:damage(stance)
+  if not stance then return end
+  local damageParameters = stance.damage
+  if not damageParameters then return end
+
+  local totalRotation = stance.armRotation + stance.weaponRotation
   
   local damageConfig = damageParameters.config
   damageConfig.baseDamage =
@@ -125,21 +127,31 @@ function Project42Neo:damage(damageParameters, weaponRotation)
     * (activeItem.ownerPowerMultiplier()^2)
     * (damageConfig.baseDamageFactor or 1)
 
+  sb.logInfo(sb.print(damageParameters.offset))
+
+  local rotation = util.toRadians(
+      (damageParameters.rotation or 0)
+      - stance.armRotation
+      - stance.weaponRotation
+  )
+
   local offset = vec2.rotate(
     vec2.add(
       self.defaultOffset,
       damageParameters.offset or {0, 0}
     ),
-    weaponRotation
-  )
-  local rotation = util.toRadians(
-      (damageParameters.rotation or 0)
-    + weaponRotation
-  )
-
+    util.toRadians(
+      -stance.armRotation
+      -stance.weaponRotation
+    )
+  ) 
   animator.resetTransformationGroup("swoosh")
   animator.rotateTransformationGroup("swoosh", rotation)
-  animator.translateTransformationGroup("swoosh", offset)
+  animator.translateTransformationGroup(
+    "swoosh",
+    offset
+  )
+  
   
   self.weapon:setDamage(
     damageConfig,
@@ -150,6 +162,7 @@ function Project42Neo:damage(damageParameters, weaponRotation)
       ),
       offset
     )
+    
   )
 
 end
