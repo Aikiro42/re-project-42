@@ -6,7 +6,6 @@
   },  
 
   "sounds":{
-    "ready": ["/sfx/interface/sniper_mark_pitch1.ogg"],
     "fire1": ["/sfx/melee/swing_dagger.ogg"]
   },
 
@@ -33,6 +32,14 @@
             "transition" : "idle"
           }
         }
+      },
+
+      "sheath": {
+        "default": "sheathed",
+        "states":{
+          "sheathed": {},
+          "unsheathed": {}
+        }
       }
       
     },
@@ -45,6 +52,25 @@
           "transformationGroups": ["weapon"],
           "offset": [0, 0],
           "image": "<partImage>"
+        }
+      },
+
+      "sheath": {
+        "properties": {
+          "centered" : true,
+          "transformationGroups": ["weapon"],
+          "offset": [0, 0],
+          "image": "<partImage>"
+        },
+        "partStates" : {
+          "sheath": {
+            "sheathed": {},
+            "unsheathed": {
+              "properties": {
+                "image": ""
+              }
+            }
+          }
         }
       },
 

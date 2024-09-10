@@ -22,6 +22,7 @@ function Weapon:init()
 
   oldWeaponInit(self)
 
+  self.weaponOffset = self.weaponOffset or {0, 0}
   self.oldWeaponOffset = self.weaponOffset
   self.newWeaponOffset = self.weaponOffset
 
