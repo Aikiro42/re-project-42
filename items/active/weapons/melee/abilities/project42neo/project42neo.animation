@@ -10,6 +10,9 @@
   },
 
   "sounds":{
+
+    "ready": [],
+
     "slash": ["/sfx/melee/swing_dagger.ogg"],
     
     "heavyLoop": ["/sfx/gun/mech_beamdrill_loop.ogg"],

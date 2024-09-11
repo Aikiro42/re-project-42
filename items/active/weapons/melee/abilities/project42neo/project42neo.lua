@@ -71,6 +71,7 @@ function Project42Neo:update(dt, fireMode, shiftHeld)
       self.idleTimer = self.idle.timeout
     else
       self:setState(self.attacking, self.combo.init)
+      self.idleTimer = self.idle.timeout
     end
   end
 
@@ -79,7 +80,7 @@ end
 -- evaluative
 
 function Project42Neo:triggering()
-  return self.fireMode == "primary"
+  return self.fireMode == (self.activatingFireMode or self.abilitySlot)
 end
 
 
@@ -132,7 +133,7 @@ end
 function Project42Neo:attacking(attackKey, isHeavy)
 
   self.isAttacking = true
-  
+  self.idleTimer = self.idle.timeout
   -- attack
   self:setStanceSequence(self.combo.attacks[attackKey].sequence, isHeavy, self.stats)
 
@@ -158,6 +159,7 @@ function Project42Neo:attacking(attackKey, isHeavy)
     
     -- if cancelled within grace period, reset
     elseif self:cancelling() then
+      animator.burstParticleEmitter("charge")
       break
     end
 
@@ -188,6 +190,8 @@ function Project42Neo:charging(attackKey)
   })
   chargingStance.animationStates = nil
   chargingStance.playSounds = nil
+  chargingStance.velocity = nil
+  chargingStance.momentum = nil
   self.weapon:setStance(chargingStance)
 
   while self:triggering() do
@@ -230,7 +234,7 @@ end
 -- actions
 
 function Project42Neo:getNextStep(attackKey, isHeavy)
-  local next = self.combo.attacks[attackKey].next or self.combo.defaultNext
+  local next = sb.jsonMerge(self.combo.defaultNext, self.combo.attacks[attackKey].next or {})
   return isHeavy and next.heavy or next.default
 end
 
@@ -266,19 +270,18 @@ function Project42Neo:damage(stance, isHeavy, stats)
 
   local totalRotation = stance.armRotation + stance.weaponRotation
   
-  local damageConfig = damageParameters.config
+  local damageConfig = sb.jsonMerge(self.globalDamageConfig, damageParameters.config or {})
   damageConfig.baseDamage =
       stats.baseDamage
     * activeItem.ownerPowerMultiplier()
     * (isHeavy and damageParameters.heavyMultiplier or damageParameters.multiplier)
   
-  animator.resetTransformationGroup("swoosh")
-
   local rotation = util.toRadians(
     (damageParameters.rotation or 0)
   )
   local offset = vec2.rotate(damageParameters.offset or {0, 0}, rotation)
-
+  
+  animator.resetTransformationGroup("swoosh")
   animator.rotateTransformationGroup("swoosh", rotation)
   animator.translateTransformationGroup("swoosh", offset)
     

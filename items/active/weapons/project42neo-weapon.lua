@@ -147,6 +147,20 @@ function Weapon:setStance(stance)
   local snapWeapon = stance.snap or (self.weaponAngularVelocity and self.weaponAngularVelocity ~= 0)
   local snapArm = stance.snap or (self.armAngularVelocity and self.armAngularVelocity ~= 0)
 
+  if stance.velocity ~= nil then
+    mcontroller.setVelocity(stance.velocity)
+  end
+
+  if stance.momentum ~= nil then
+    local appliedMomentum
+    if stance.aimMomentum then
+      appliedMomentum = vec2.rotate(stance.momentum, activeItem.aimAngle(0, activeItem.ownerAimPosition()))
+    else
+      appliedMomentum = stance.momentum
+    end
+    mcontroller.addMomentum(appliedMomentum)
+  end
+
   if stance.weaponHidden ~= nil then
     activeItem.setHoldingItem(not stance.weaponHidden)
   else
@@ -213,6 +227,14 @@ function Weapon:setStance(stance)
 
   for _, soundName in pairs(stance.playSounds or {}) do
     animator.playSound(soundName)
+  end
+
+  for _, soundName in pairs(stance.loopSounds or {}) do
+    animator.playSound(soundName, -1)
+  end
+
+  for _, soundName in pairs(stance.stopSounds or {}) do
+    animator.stopAllSounds(soundName)
   end
 
   for _, particleEmitterName in pairs(stance.burstParticleEmitters or {}) do

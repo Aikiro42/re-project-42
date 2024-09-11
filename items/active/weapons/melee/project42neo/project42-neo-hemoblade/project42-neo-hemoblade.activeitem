@@ -20,6 +20,11 @@
   },
 
   "animationCustom": {
+
+    "sounds": {
+      "ready": ["/sfx/gun/magnorbs_shield_loop2.ogg"]
+    },
+
     "animatedParts": {
       "stateTypes": {
         "sheath": {
