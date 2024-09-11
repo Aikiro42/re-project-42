@@ -1,0 +1,24 @@
+
+/*
+Credits to Nebulox and Nitrosteel for the particle code
+*/
+{
+  "kind": "project42neoshineparticle",
+  "definition": {
+    "type" : "animated",
+    "animation" : "/particles/project42neo/project42neoshineparticle/project42neoshineparticle.animation",
+    "position" : [0, 0],
+    "initialVelocity" : [0, 0.1],
+    "collidesForeground" : false,
+    "timeToLive" : 1.0,
+    "destructionTime" : 0.1,
+    "destructionAction" : "fade",
+    "fullbright" : true,
+    "size" : 0.75,
+    "layer" : "front",
+    "variance" : {
+      "size" : 0.64,
+      "rotation" : 180
+    }
+  }
+}

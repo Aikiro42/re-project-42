@@ -33,6 +33,9 @@ end
 function Weapon:update(dt, fireMode, shiftHeld)
   
   oldWeaponUpdate(self, dt, fireMode, shiftHeld)
+
+  activeItem.setScriptedAnimationParameter("ownerVelocity", mcontroller.velocity())
+  activeItem.setScriptedAnimationParameter("ownerCrouching", mcontroller.crouching())
   
   if self.stanceProgress < 1 then -- prevent from computing when unnecessary
 
@@ -117,6 +120,24 @@ function Weapon:updateAim()
   end
 end
 
+function Weapon:screenShake(intensity)
+  intensity = (intensity or 0.3)/2
+
+
+  local offset = vec2.rotate({intensity, 0}, sb.nrand(math.pi, math.pi))
+
+  local cam = world.spawnProjectile(
+    "screenshakeProjectile",
+    vec2.add(mcontroller.position(), offset),
+    activeItem.ownerEntityId(),
+    {1, 0},
+    true
+  )
+  activeItem.setCameraFocusEntity(cam)
+
+
+end
+
 function Weapon:setStance(stance)
   
   if not stance then return end
@@ -125,6 +146,23 @@ function Weapon:setStance(stance)
 
   local snapWeapon = stance.snap or (self.weaponAngularVelocity and self.weaponAngularVelocity ~= 0)
   local snapArm = stance.snap or (self.armAngularVelocity and self.armAngularVelocity ~= 0)
+
+  if stance.weaponHidden ~= nil then
+    activeItem.setHoldingItem(not stance.weaponHidden)
+  else
+    activeItem.setHoldingItem(true)
+  end
+
+  if stance.sheathVisible ~= nil then
+    activeItem.setScriptedAnimationParameter("sheathVisible", stance.sheathVisible)
+  end
+  if stance.sheathStatus ~= nil then
+    activeItem.setScriptedAnimationParameter("sheathStatus", stance.sheathStatus)
+  end
+
+  activeItem.setScriptedAnimationParameter("sheathOffset", stance.sheathOffset or {0, 0})
+  activeItem.setScriptedAnimationParameter("sheathRotation", stance.sheathRotation or 0)
+  activeItem.setScriptedAnimationParameter("sheathDirectives", stance.sheathDirectives or "")
 
   self.newWeaponRotation = util.toRadians(stance.weaponRotation or 0)
   self.newWeaponOffset = stance.weaponOffset or {0, 0}
@@ -167,7 +205,7 @@ function Weapon:setStance(stance)
     self.relativeArmRotation = self.baseArmRotation + self.recoilAmount/2
   end
 
-  animator.setPartTag("melee", "stanceDirectives", stance.weaponDirectives or "")
+  animator.setGlobalTag("stanceDirectives", stance.weaponDirectives or "")
   
   for stateType, state in pairs(stance.animationStates or {}) do
     animator.setAnimationState(stateType, state)

@@ -1,4 +1,5 @@
 require "/scripts/util.lua"
+require "/scripts/status.lua"
 require "/scripts/vec2.lua"
 require "/items/active/weapons/project42neo-weapon.lua"
 
@@ -22,10 +23,18 @@ function init()
   end
 
   self.weapon:init()
+
+  self.screenShakeListener = damageListener("inflictedDamage", function(notifications)
+    if #notifications > 0 then
+      self.weapon:screenShake(0.5)
+    end
+  end)
+
 end
 
 function update(dt, fireMode, shiftHeld)
   self.weapon:update(dt, fireMode, shiftHeld)
+  self.screenShakeListener:update()
 end
 
 function uninit()

@@ -1,0 +1,17 @@
+{
+  "frameGrid" : {
+    "size" : [52, 12],
+    "dimensions" : [11, 3],
+    "names" : [
+      [ "sheathed.1", null, null, null, null, null, null, null, null, null, null],
+      [ "unsheathing.1", null, null, null, null, null, null, null, null, null, null],
+      [ "ready.1", "ready.2", "ready.3", "ready.4", "ready.5", "ready.6", "ready.7", "ready.8", "ready.9", "ready.10", "ready.11"]
+    ]
+    
+  },
+
+  
+  "aliases" : {
+    "sheathing.1" : "unsheathing.1"
+  }
+}

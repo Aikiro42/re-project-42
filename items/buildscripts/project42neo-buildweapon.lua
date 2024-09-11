@@ -51,13 +51,17 @@ function build(directory, config, parameters, level, seed)
   if config.baseOffset then
 
     local swordParts = {
-      "melee",
-      "sheath"
+      "blade",
+      "bladeFullbright",
+      "charge",
+      "chargeFullbright"
     }
 
     for _, part in ipairs(swordParts) do
+
       construct(config, "animationCustom", "animatedParts", "parts", part, "properties")
       config.animationCustom.animatedParts.parts[part].properties.offset = config.baseOffset
+
     end
 
   end

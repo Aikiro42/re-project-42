@@ -14,8 +14,7 @@
   "inventoryIcon" : "project42neo-test-katana.png",
   
   "animationParts" : {
-    "melee" : "project42neo-test-katana.png",
-    "sheath": "project42neo-test-katana-sheath.png"
+    "blade" : "project42neo-test-katana.png"
   },
 
   "scripts" : ["/items/active/weapons/melee/project42neo-meleeweapon.lua"],
@@ -25,9 +24,5 @@
   "baseOffset": [2, 0],
   "primaryAbilityType" : "project42neo",
   
-  "sheath": {
-    "image": "/items/active/weapons/melee/project42neo/project42neo-test-katana/project42neo-test-katana"
-  },
-
   "builder" : "/items/buildscripts/project42neo-buildweapon.lua"
 }

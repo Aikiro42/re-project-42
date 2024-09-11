@@ -1,0 +1,119 @@
+{
+  "itemName" : "project42-neo-hemoblade",
+  "price" : 4200,
+  "level" : 1,
+  "maxStack" : 1,
+  "rarity" : "Essential",
+  "description" : "The first iteration of the standard melee weapon of Letheia Elite troops.",
+  "shortdescription" : "HF Hemoblade",
+  "tooltipKind" : "sword",
+  "category" : "broadsword",
+  "twoHanded" : true,
+  "itemTags" : ["weapon","melee","broadsword","katana"],
+
+  "inventoryIcon" : "project42-neo-hemoblade.png",
+  
+  "animationParts" : {
+    "blade" : "project42-neo-hemoblade.png",
+    "bladeFullbright" : "project42-neo-hemoblade-fullbright.png",
+    "charge": ""
+  },
+
+  "animationCustom": {
+    "animatedParts": {
+      "stateTypes": {
+        "sheath": {
+          "states":{
+            "ready": {
+              "frames": 11,
+              "cycle": 1
+            }
+          }
+        }
+      },
+
+      "parts": {
+        "swoosh": {
+          "properties": {
+            "fullbright": true
+          },
+          "partStates": {
+            "swoosh" : {
+              "verticalslash" : {
+                "properties" : {
+                  "image" : "/items/active/weapons/melee/project42neo/project42-neo-hemoblade/swoosh/verticalslash.png:<frame>"
+                }
+              },
+              "upperverticalslash" : {
+                "properties" : {
+                  "image" : "/items/active/weapons/melee/project42neo/project42-neo-hemoblade/swoosh/verticalslash.png:<frame>?flipy"
+                }
+              },
+              "diagonalslash" : {
+                "properties" : {
+                  "image" : "/items/active/weapons/melee/project42neo/project42-neo-hemoblade/swoosh/diagonalslash.png:<frame>"
+                }
+              },
+              "upperdiagonalslash" : {
+                "properties" : {
+                  "image" : "/items/active/weapons/melee/project42neo/project42-neo-hemoblade/swoosh/diagonalslash.png:<frame>?flipy"
+                }
+              },
+              "stab" : {
+                "properties" : {
+                  "image" : "/items/active/weapons/melee/project42neo/project42-neo-hemoblade/swoosh/stab.png:<frame>"
+                }
+              },
+              "horizontalslash": {
+                "properties" : {
+                  "image" : "/items/active/weapons/melee/project42neo/project42-neo-hemoblade/swoosh/horizontalslash.png:<frame>"
+                }
+              },
+              "risingslash": {
+                "properties" : {
+                  "image" : "/items/active/weapons/melee/project42neo/project42-neo-hemoblade/swoosh/risingslash.png:<frame>"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "particleEmitters": {
+      "blade": {
+        "offsetRegion" : [-1, -1, 4, 1],
+        "emissionRate" : 10,
+        "particles" : [
+          {"particle": "firestormflame"}
+        ]
+      }
+    }
+  },
+
+  "scripts" : ["/items/active/weapons/melee/project42neo-meleeweapon.lua"],
+
+  "elementalType" : "fire",
+
+  "baseOffset": [2, 0],
+  "primaryAbilityType" : "project42neo",
+  
+  "sheath": {
+    "image": {
+      "sheathed": "/items/active/weapons/melee/project42neo/project42-neo-hemoblade/project42-neo-hemoblade.png:sheathed.1",
+      "unsheathed": "/items/active/weapons/melee/project42neo/project42-neo-hemoblade/project42-neo-hemoblade-sheath.png"
+    },
+    "offset": [-1, -1.25],
+    "rotation": 15
+  },
+  
+  "primaryAbility": {
+    "stats": {
+      "attackSpeed": 1,
+      "baseDamage": 42,
+      "critChance": 0.32,
+      "critDamage": 2.2
+    }
+  },
+  
+  "builder" : "/items/buildscripts/project42neo-buildweapon.lua"
+}

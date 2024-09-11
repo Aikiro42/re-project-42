@@ -11,12 +11,16 @@
 
   "sounds":{
     "slash": ["/sfx/melee/swing_dagger.ogg"],
+    
+    "heavyLoop": ["/sfx/gun/mech_beamdrill_loop.ogg"],
+    "heavyReady": [ "/sfx/melee/sword_parry.ogg" ],
     "heavy": ["/sfx/melee/astraltear1.ogg", "/sfx/melee/astraltear2.ogg"]
   },
 
   "animatedParts": {
 
     "stateTypes": {
+
       "swoosh": {
         "default": "idle",
         "states":{
@@ -28,23 +32,51 @@
         "default": "sheathed",
         "states":{
           "sheathed": {},
-          "unsheathed": {}
+          "unsheathing": {
+              "frames" : 1,
+              "cycle" : 0.3,
+              "mode" : "transition",
+              "transition" : "ready"
+          },
+          "sheathing": {
+              "frames" : 1,
+              "cycle" : 0.3,
+              "mode" : "transition",
+              "transition" : "ready"
+          },
+          "ready": {
+            "frames" : 1,
+            "cycle" : 0.3,
+            "mode" : "loop"
+          }
         }
+      },
+      
+      "charge": {
+        "default": "off",
+        "states": {
+          "off": {
+
+          },
+          "charging": {
+            "mode": "loop",
+            "frames": 1,
+            "cycle": 0.3
+          },
+          "charged": {
+            "mode": "loop",
+            "frames": 1,
+            "cycle": 0.3
+          }
+        }
+
       }
       
     },
     
     "parts": {
-      "melee": {
-        "properties": {
-          "centered" : true,
-          "transformationGroups": ["weapon"],
-          "offset": [0, 0],
-          "image": "<partImage><stanceDirectives>"
-        }
-      },
 
-      "sheath": {
+      "blade": {
         "properties": {
           "centered" : true,
           "transformationGroups": ["weapon"],
@@ -53,10 +85,85 @@
         },
         "partStates" : {
           "sheath": {
-            "sheathed": {},
-            "unsheathed": {
+            "sheathed": {
               "properties": {
-                "image": ""
+                "image": "<partImage>:sheathed.<frame><stanceDirectives>"
+              }
+            },
+            "unsheathing": {
+              "properties": {
+                "image": "<partImage>:unsheathing.<frame><stanceDirectives>"
+              }
+            },
+            "sheathing": {
+              "properties": {
+                "image": "<partImage>:sheathing.<frame><stanceDirectives>"
+              }
+            },
+            "ready": {
+              "properties": {
+                "image": "<partImage>:ready.<frame><stanceDirectives>"
+              }
+            }
+          }
+        }
+      },
+      "bladeFullbright": {
+        "properties": {
+          "zLevel": 99,
+          "centered" : true,
+          "fullbright": true,
+          "transformationGroups": ["weapon"],
+          "offset": [0, 0],
+          "image": "<partImage><stanceDirectives>"
+        },
+        "partStates" : {
+          "sheath": {
+            "sheathed": {
+              "properties": {
+                "image": "<partImage>:sheathed.<frame><stanceDirectives>"
+              }
+            },
+            "unsheathing": {
+              "properties": {
+                "image": "<partImage>:unsheathing.<frame><stanceDirectives>"
+              }
+            },
+            "sheathing": {
+              "properties": {
+                "image": "<partImage>:sheathing.<frame><stanceDirectives>"
+              }
+            },
+            "ready": {
+              "properties": {
+                "image": "<partImage>:ready.<frame><stanceDirectives>"
+              }
+            }
+          }
+        }
+      },
+
+      "charge": {
+        "properties": {
+          "centered" : true,
+          "transformationGroups": ["weapon"],
+          "offset": [0, 0]
+        },
+        "partStates" : {
+          "charge": {
+            "off": {
+              "properties": {
+                "image": "<partImage>:off.<frame><stanceDirectives>"
+              }
+            },
+            "charging": {
+              "properties": {
+                "image": "<partImage>:charging.<frame><stanceDirectives>"
+              }
+            },
+            "charged": {
+              "properties": {
+                "image": "<partImage>:charged.<frame><stanceDirectives>"
               }
             }
           }
@@ -81,5 +188,29 @@
         }
       }
     }
+  },
+
+  "particleEmitters" : {
+    "charge": {
+      "transformationGroups" : ["weapon"],
+      "offsetRegion" : [0, 0, 0, 0],
+      "emissionRate" : 1,
+      "particles" : [
+        {"particle": "capturepodred"},
+        {"particle": "capturepodred"},
+        {"particle": "project42neoshineparticle"},
+        {"particle": "project42neoshineparticle"},
+        {"particle": "project42neoshineparticle"},
+        {"particle": "project42neoshineparticle"}
+      ]
+    },
+    "blade": {
+      "transformationGroups" : ["weapon"],
+      "offsetRegion" : [-1, -1, 4, 1],
+      // "offsetRegion" : [0, 0, 0, 0],
+      "emissionRate" : 10,
+      "particles" : []
+    }
   }
+
 }
