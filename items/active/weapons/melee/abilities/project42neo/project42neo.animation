@@ -9,6 +9,11 @@
     "stanceDirectives": ""
   },
 
+  "sounds":{
+    "slash": ["/sfx/melee/swing_dagger.ogg"],
+    "heavy": ["/sfx/melee/astraltear1.ogg", "/sfx/melee/astraltear2.ogg"]
+  },
+
   "animatedParts": {
 
     "stateTypes": {

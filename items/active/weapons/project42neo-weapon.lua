@@ -143,7 +143,11 @@ function Weapon:setStance(stance)
 
   self.stance = stance
   self.newAimAngle = stance.aimAngle
-  self.stanceTransitionSpeedMult = stance.transitionSpeedMult or 4
+  if stance.duration then
+    self.stanceTransitionSpeedMult  = 1/math.max(0.001, stance.duration)
+  else
+    self.stanceTransitionSpeedMult = stance.transitionSpeedMult
+  end
   self.weaponOffset = self.oldWeaponOffset
 
   self.relativeWeaponRotationCenter = stance.weaponRotationCenter or {0, 0}
