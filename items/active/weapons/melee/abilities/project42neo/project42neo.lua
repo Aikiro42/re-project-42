@@ -6,6 +6,10 @@ require "/items/active/weapons/project42neo-weapon.lua"
 
 Project42Neo = WeaponAbility:new()
 
+function Project42Neo:__debug(dt, fireMode, shiftHeld)
+  status.giveResource("health", 9999)
+end
+
 function Project42Neo:init()
   
   self.defaultOffset = config.getParameter(self.offsetParameter, {0, 0})
@@ -23,14 +27,63 @@ function Project42Neo:init()
   self.idleTimer = -1
   self.heavyAttackTime = 0.3
 
-  if self.combo.debugInit then
-    self.combo.init = self.combo.debugInit
-    for i, _ in ipairs(self.combo.attacks[self.combo.init].sequence) do
-      self.combo.attacks[self.combo.init].sequence[i].allowRotate = false
-      self.combo.attacks[self.combo.init].sequence[i].allowFlip = false
-      self.combo.attacks[self.combo.init].sequence[i].aimAngle = 0
-      self.combo.attacks[self.combo.init].next = {
-        default = self.combo.init
+  self.currentDamage = {
+    duration = 0
+  }
+  self.currentShield = {
+    duration = 0,
+    listener = damageListener("damageTaken", function(notifications)
+      for _, notification in ipairs(notifications) do
+        if notification.hitType == "ShieldHit" then
+          animator.playSound("parry")
+          self.currentShield.duration = 0
+          self.currentShield.args = nil
+          break
+        end
+      end
+    end)
+  }
+
+  if self.combo.debugAttack then
+    self.combo.init = {
+      default = self.combo.debugAttack,
+      normal = {
+        default = self.combo.debugAttack
+      },
+      normalAirborne = {
+        default = self.combo.debugAttack
+      }
+    }
+    for i, _ in ipairs(self.combo.attacks[self.combo.init.default].sequence) do
+      self.combo.attacks[self.combo.init.default].sequence[i].allowRotate = false
+      self.combo.attacks[self.combo.init.default].sequence[i].allowFlip = false
+      self.combo.attacks[self.combo.init.default].sequence[i].aimAngle = 0
+      self.combo.attacks[self.combo.init.default].next = {
+        default = self.combo.init.default,
+        normal = {
+          default = self.combo.init.default,
+          up = self.combo.init.default,
+          side = self.combo.init.default,
+          down = self.combo.init.default
+        },
+        normalAirborne = {
+          default = self.combo.init.default,
+          up = self.combo.init.default,
+          side = self.combo.init.default,
+          down = self.combo.init.default
+        },
+        heavy = {
+          default = self.combo.init.default,
+          up = self.combo.init.default,
+          side = self.combo.init.default,
+          down = self.combo.init.default
+        },
+        heavyAirborne = {
+          default = self.combo.init.default,
+          up = self.combo.init.default,
+          side = self.combo.init.default,
+          down = self.combo.init.default
+        }
       }
     end
   end
@@ -49,9 +102,41 @@ function Project42Neo:update(dt, fireMode, shiftHeld)
 
   WeaponAbility.update(self, dt, fireMode, shiftHeld)
 
+  activeItem.setCursor("/cursors/project42neo/meleecursor/meleecursor-" .. self:cursorDirection() .. ".cursor")
+  status.addEphemeralEffect("nofalldamage", 1)
   activeItem.setScriptedAnimationParameter("sheathAnimationState", animator.animationState("sheath"))
   
   self.cooldownTimer = math.max(0, self.cooldownTimer - self.dt)
+
+  self:__debug(dt, fireMode, shiftHeld)
+
+  self.currentDamage.duration = math.max(0, self.currentDamage.duration - self.dt)
+  if self.currentDamage.duration == 0 then
+    self.currentDamage.args = nil
+  end
+
+  if self.currentDamage.args then
+    self.weapon:setDamage(
+      self.currentDamage.args.damageConfig,
+      self.currentDamage.args.damageArea
+    )
+  else
+    self.weapon:setDamage()
+  end
+
+  
+  self.currentShield.duration = math.max(0, self.currentShield.duration - self.dt)
+  if self.currentShield.duration == 0 then
+    self.currentShield.args = nil    
+  end
+
+  if self.currentShield.args then
+    activeItem.setShieldPolys(self.currentShield.args.polys)
+    self.currentShield.listener:update()
+  else
+    activeItem.setShieldPolys()
+  end
+
   
   if self.idleTimer > 0
   and not self.weapon.currentAbility
@@ -70,7 +155,7 @@ function Project42Neo:update(dt, fireMode, shiftHeld)
       self:setState(self.unsheathing)
       self.idleTimer = self.idle.timeout
     else
-      self:setState(self.attacking, self.combo.init)
+      self:setState(self.attacking, self:getFirstStep())
       self.idleTimer = self.idle.timeout
     end
   end
@@ -141,8 +226,13 @@ function Project42Neo:attacking(attackKey, isHeavy)
   local triggered = self:triggering()
   if triggered and not isHeavy then
     self:setState(self.charging, attackKey)
-    return
+  else
+    self:setState(self.transisting, attackKey)
   end
+
+end
+
+function Project42Neo:transisting(attackKey)
 
   -- otherwise, initiate grace period
   local gracePeriod = self.comboGracePeriod
@@ -207,7 +297,11 @@ function Project42Neo:charging(attackKey)
         heavyReady = true
         self.weapon:screenShake(0.5)
       end
-      if self.combo.attacks[attackKey].autoFireHeavy then break end
+      if self.combo.attacks[attackKey].autoFireHeavy then
+        break
+      else
+        status.addEphemeralEffect("project42neoperfectheavy")
+      end
     end
 
     coroutine.yield()
@@ -219,8 +313,7 @@ function Project42Neo:charging(attackKey)
     local nextAttackKey = self:getNextStep(attackKey, true)
     self:setState(self.attacking, nextAttackKey, true)
   else
-    local nextAttackKey = self:getNextStep(attackKey, false)
-    self:setState(self.attacking, nextAttackKey)
+    self:setState(self.transisting, attackKey)
   end
 
 end
@@ -233,9 +326,35 @@ end
 
 -- actions
 
+function Project42Neo:getFirstStep()
+  local nexts = self.combo.init
+  local direction = self:cursorDirection()
+
+  local nextStep
+
+  nextStep = nexts["normal" .. (not mcontroller.groundMovement() and "Airborne" or "")][direction]
+    or nexts["normal" .. (not mcontroller.groundMovement() and "Airborne" or "")].default
+
+  return nextStep or nexts.default
+end
+
 function Project42Neo:getNextStep(attackKey, isHeavy)
-  local next = sb.jsonMerge(self.combo.defaultNext, self.combo.attacks[attackKey].next or {})
-  return isHeavy and next.heavy or next.default
+  local nexts = sb.jsonMerge(self.combo.defaultNext, self.combo.attacks[attackKey].next or {})
+  
+  local direction = self:cursorDirection()
+
+  local nextStep
+
+  if isHeavy then
+    nextStep = nexts["heavy" .. (not mcontroller.groundMovement() and "Airborne" or "")][direction]
+      or nexts["heavy" .. (not mcontroller.groundMovement() and "Airborne" or "")].default
+  else
+    nextStep = nexts["normal" .. (not mcontroller.groundMovement() and "Airborne" or "")][direction]
+      or nexts["normal" .. (not mcontroller.groundMovement() and "Airborne" or "")].default
+  end
+
+  return nextStep or nexts.default
+
 end
 
 function Project42Neo:setStanceSequence(stanceSequence, isHeavy, stats)
@@ -260,6 +379,7 @@ function Project42Neo:damage(stance, isHeavy, stats)
   if not stance.damage then return end
 
   status.overConsumeResource("energy", isHeavy and stats.heavyEnergyCost or stance.damage.energyCost or 0)
+  status.consumeResource("health", isHeavy and stats.heavyHealthCost or stance.damage.healthCost or 0)
   
   local damageParameters = stance.damage
 
@@ -267,8 +387,6 @@ function Project42Neo:damage(stance, isHeavy, stats)
     animator.playSound("heavy")
     self.weapon:screenShake(1)
   end
-
-  local totalRotation = stance.armRotation + stance.weaponRotation
   
   local damageConfig = sb.jsonMerge(self.globalDamageConfig, damageParameters.config or {})
   damageConfig.baseDamage =
@@ -284,7 +402,20 @@ function Project42Neo:damage(stance, isHeavy, stats)
   animator.resetTransformationGroup("swoosh")
   animator.rotateTransformationGroup("swoosh", rotation)
   animator.translateTransformationGroup("swoosh", offset)
-    
+
+  self.currentDamage.duration = damageParameters.duration or 0.1
+  self.currentDamage.args = {
+    damageConfig = damageConfig,
+    damageArea = poly.translate(
+      poly.rotate(
+        damageParameters.area or {},
+        rotation
+      ),
+      offset
+    )
+  }
+
+  --[[
   self.weapon:setDamage(
     damageConfig,
     poly.translate(
@@ -295,12 +426,37 @@ function Project42Neo:damage(stance, isHeavy, stats)
       offset
     )
   )
+  --]]
 
 end
 
 function Project42Neo:shield(stance)
+
   if not stance then return end
-  if not stance.shield then return end
+  if not stance.shield then
+    self.currentShield.args = nil
+    self.currentShield.duration = 0
+    return
+  end
+  
+  local shieldParameters = stance.shield
+  
+  local rotation = util.toRadians(
+    (shieldParameters.rotation or 0)
+  )
+  local offset = vec2.rotate(shieldParameters.offset or {0, 0}, rotation)
+
+  self.currentShield.duration = shieldParameters.duration or stance.duration or 0
+  self.currentShield.args = {
+    polys = {poly.translate(
+      poly.rotate(
+        shieldParameters.area or {},
+        stance.aimAngle or activeItem.aimAngle(0, activeItem.ownerAimPosition())
+      ),
+      offset
+    )}
+  }
+
 end
 
 function Project42Neo:projectile(stance)

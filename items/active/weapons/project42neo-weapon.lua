@@ -28,6 +28,14 @@ function Weapon:init()
 
   self.oldAimAngle = self.aimAngle or 0
 
+  self.stanceTimer = {
+    current = 0,
+    max = 0,
+    progress = 1
+  }
+
+  self.targetBodyRotation = 0
+  
 end
 
 function Weapon:update(dt, fireMode, shiftHeld)
@@ -39,7 +47,15 @@ function Weapon:update(dt, fireMode, shiftHeld)
   
   if self.stanceProgress < 1 then -- prevent from computing when unnecessary
 
-    self.stanceProgress = math.min(1, self.stanceProgress + dt*(self.stanceTransitionSpeedMult or 4))
+    if self.stanceTimer.max > 0 then
+      self.stanceProgress = self.stanceTimer.progress
+    else
+      self.stanceProgress = math.min(1, self.stanceProgress + dt * (self.stanceTransitionSpeedMult or 4))
+    end
+      
+    if self.stance.velocity then
+      mcontroller.setVelocity(self.stance.velocity)
+    end
 
     if self.armAngularVelocity == 0 then
       self.baseArmRotation = interp[self.stanceInterpolationMethod](self.stanceProgress, self.oldArmRotation or 0, self.newArmRotation)
@@ -55,7 +71,28 @@ function Weapon:update(dt, fireMode, shiftHeld)
     }
 
   end
-  
+
+  if self.stanceTimer.max > 0 then
+    self.stanceTimer.current = self.stanceTimer.current + dt
+    self.stanceTimer.progress = self.stanceTimer.current / self.stanceTimer.max
+  end
+
+  mcontroller.setRotation(interp[self.stanceInterpolationMethod](self.stanceTimer.progress, 0, -2 * math.pi * (self.stance.flips or 0)))
+  if not mcontroller.groundMovement() then
+    if self.stance.airborneControlVelocity then
+      mcontroller.controlApproachVelocity(self.stance.airborneControlVelocity.velocity, self.stance.airborneControlVelocity.force)
+    elseif self.stance.airborneVelocity then
+      mcontroller.setVelocity(self.stance.airborneControlVelocity)
+    end  
+  else
+    if self.stance.controlVelocity then
+      mcontroller.controlApproachVelocity(self.stance.controlVelocity.velocity, self.stance.controlVelocity.force)
+    elseif self.stance.velocity then
+      mcontroller.setVelocity(self.stance.velocity)
+    end  
+  end
+
+
   self.relativeArmRotation = self.baseArmRotation + self.recoilAmount/2
   self.relativeWeaponRotation = self.baseWeaponRotation + self.recoilAmount/2
   
@@ -139,7 +176,7 @@ function Weapon:screenShake(intensity)
 end
 
 function Weapon:setStance(stance)
-  
+
   if not stance then return end
   if stance.disabled then return end
   if self.stance == stance then return end
@@ -154,7 +191,9 @@ function Weapon:setStance(stance)
   if stance.momentum ~= nil then
     local appliedMomentum
     if stance.aimMomentum then
-      appliedMomentum = vec2.rotate(stance.momentum, activeItem.aimAngle(0, activeItem.ownerAimPosition()))
+      local aimAngle, aimDirection = activeItem.aimAngleAndDirection(0, activeItem.ownerAimPosition())
+      appliedMomentum = vec2.rotate(stance.momentum, aimAngle)
+      appliedMomentum[1] = aimDirection * appliedMomentum[1]
     else
       appliedMomentum = stance.momentum
     end
@@ -181,6 +220,8 @@ function Weapon:setStance(stance)
   self.newWeaponRotation = util.toRadians(stance.weaponRotation or 0)
   self.newWeaponOffset = stance.weaponOffset or {0, 0}
   self.newArmRotation = util.toRadians(stance.armRotation or 0)
+  
+  self.targetBodyRotation = (stance.flips or 0) * -2 * math.pi
 
   self.stanceInterpolationMethod = stance.interpolationMethod or "sin"
   
@@ -194,12 +235,15 @@ function Weapon:setStance(stance)
   -- stance.allowFlip = stance.allowFlip == nil or stance.allowFlip
 
   self.stance = stance
+  
   self.newAimAngle = stance.aimAngle
-  if stance.duration then
-    self.stanceTransitionSpeedMult  = 1/math.max(0.001, stance.duration)
-  else
-    self.stanceTransitionSpeedMult = stance.transitionSpeedMult
-  end
+
+  self.stanceTimer = {
+    current = 0,
+    max = stance.duration or 0,
+    progress = 0
+  }
+  self.stanceTransitionSpeedMult = stance.transitionSpeedMult
   self.weaponOffset = self.oldWeaponOffset
 
   self.relativeWeaponRotationCenter = stance.weaponRotationCenter or {0, 0}
@@ -223,6 +267,10 @@ function Weapon:setStance(stance)
   
   for stateType, state in pairs(stance.animationStates or {}) do
     animator.setAnimationState(stateType, state)
+  end
+
+  for light, active in pairs(stance.lights or {}) do
+    animator.setLightActive(light, active)
   end
 
   for _, soundName in pairs(stance.playSounds or {}) do

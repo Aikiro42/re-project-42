@@ -1,0 +1,12 @@
+{
+  "name" : "project42neoperfectheavy",
+  "blockingStat" : "project42neoperfectheavy",
+  "scripts": ["project42neoperfectheavy.lua"],
+
+  "effectConfig" : {},
+  "defaultDuration" : 0.2,
+
+  "icon": "/stats/effects/project42neo/project42perfectheavy/project42neoperfectheavy.png",
+  "label": "Unleash to deal higher heavy attack damage!"
+
+}

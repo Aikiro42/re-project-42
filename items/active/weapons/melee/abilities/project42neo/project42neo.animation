@@ -17,7 +17,10 @@
     
     "heavyLoop": ["/sfx/gun/mech_beamdrill_loop.ogg"],
     "heavyReady": [ "/sfx/melee/sword_parry.ogg" ],
-    "heavy": ["/sfx/melee/astraltear1.ogg", "/sfx/melee/astraltear2.ogg"]
+    "heavy": ["/sfx/melee/astraltear1.ogg", "/sfx/melee/astraltear2.ogg"],
+
+    "parry": [ "/sfx/melee/sword_parry.ogg" ]
+    
   },
 
   "animatedParts": {

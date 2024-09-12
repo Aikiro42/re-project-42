@@ -11,6 +11,7 @@ function init()
   oldInit()
 
   self.sheathProperties = animationConfig.animationParameter("sheathProperties")
+  self.sheathJiggleProgress = 0
 
 end
 
@@ -21,9 +22,12 @@ function update(dt)
 
   oldUpdate()
 
+  __debug_stuff()
+
   self.sheathVisible = animationConfig.animationParameter("sheathVisible", false)
   self.ownerVelocity = animationConfig.animationParameter("ownerVelocity", {0, 0})
   self.ownerCrouching = animationConfig.animationParameter("ownerCrouching", false)
+  self.sheathJiggleProgress = self.sheathJiggleProgress < 1 and (self.sheathJiggleProgress + dt*3) or 0
 
   if self.sheathProperties
   and self.sheathVisible
@@ -57,4 +61,20 @@ function movementOffset(velocity)
     0,
     -util.clamp(0.25, -0.25, velocity[2]*0.01)
   }
+end
+
+function __debug_stuff()
+
+end
+
+function renderText(offset, text, color, size, fullbright)
+  localAnimator.spawnParticle({
+    type = "text",
+    text= text,
+    color = color or {255,255,255},
+    size = size or 0.5,
+    fullbright = fullbright,
+    flippable = false,
+    layer = "front"
+  }, vec2.add(activeItemAnimation.ownerPosition(), offset))
 end

@@ -1,20 +1,27 @@
-origin = (110, 52)
+from math import sin, cos, pi
 
-points = [
-  (39, 1),
-  (58, 1),
-  (89, 9),
-  (109, 23),
-  (109, 32),
-  (109, 32),
-  (102, 39),
-  (76, 46),
-  (36, 48),
-  (1, 40),
-]
+def pixelCoorsToStarbound(dimensions, points):
+  for coord in points:
+    x = coord[0] - dimensions[0]/2
+    y = -coord[1] + dimensions[1]/2
+    y *= 1
+    print(f"[{x/8}, {y/8}],")
 
-for coord in points:
-  x = coord[0] - origin[0]/2
-  y = -coord[1] + origin[1]/2
-  y *= -1
-  print(f"[{x/8}, {y/8}],")
+
+def circleDamageArea(radius, segments):
+  angleIncrement = 2*pi/segments
+  for i in range(segments):
+    x = radius * cos(angleIncrement * i)
+    y = radius * sin(angleIncrement * i)
+    print(f"[{x:.2f}, {y:.2f}],")
+    
+if __name__ == "__main__":
+  dimensions = (50, 48)
+  points = [
+    (49, 47),
+    (49, 0),
+    (20, 2),
+    (0, 18),
+  ]
+  pixelCoorsToStarbound(dimensions, points)
+

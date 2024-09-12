@@ -11,7 +11,7 @@
   "twoHanded" : true,
   "itemTags" : ["weapon","melee","broadsword","katana"],
 
-  "inventoryIcon" : "project42-neo-hemoblade.png",
+  "inventoryIcon" : "project42-neo-hemoblade.png:unsheathing.1",
   
   "animationParts" : {
     "blade" : "project42-neo-hemoblade.png",
@@ -92,7 +92,14 @@
           {"particle": "firestormflame"}
         ]
       }
-    }
+    },
+    "lights" : {
+      "glow" : {
+        "active": false,
+        "position" : [1.0, 0.0],
+        "color" : [100, 0, 0]
+      }
+    }  
   },
 
   "scripts" : ["/items/active/weapons/melee/project42neo-meleeweapon.lua"],
@@ -113,7 +120,7 @@
   
   "primaryAbility": {
     "stats": {
-      "attackSpeed": 1,
+      "attackSpeed": 2,
       "baseDamage": 42,
       "critChance": 0.32,
       "critDamage": 2.2
