@@ -121,7 +121,7 @@
   "primaryAbility": {
     "stats": {
       "attackSpeed": 2,
-      "baseDamage": 42,
+      "baseDamage": 4.2,
       "critChance": 0.32,
       "critDamage": 2.2
     }

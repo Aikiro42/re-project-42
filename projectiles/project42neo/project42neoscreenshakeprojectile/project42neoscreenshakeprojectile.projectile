@@ -1,13 +1,12 @@
 {
-  "projectileName" : "screenshakeProjectile",
-  "image" : "screenshakeProjectile.png",
+  "projectileName" : "project42neoscreenshakeprojectile",
+  "image" : "project42neoscreenshakeprojectile.png",
   "frameNumber" : 1,
   "power": 0,
   "speed" : 0,
   "damagePoly" : [[0, 0]],
   "animationLoops" : false,
   "flippable" : true,
-  "damageTeam" : { "type" : "indiscriminate" },
   "damageKind" : "NoDamage",
   "timeToLive": 0.05
 }

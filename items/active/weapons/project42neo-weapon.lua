@@ -1,9 +1,11 @@
+require "/scripts/poly.lua"
 require "/scripts/util.lua"
 require "/scripts/interp.lua"
 require "/items/active/weapons/weapon.lua"
 
 local oldWeaponInit = Weapon.init
 local oldWeaponUpdate = Weapon.update
+local oldWeaponDamageSource = Weapon.damageSource
 
 function Weapon:init()
 
@@ -22,6 +24,7 @@ function Weapon:init()
 
   oldWeaponInit(self)
 
+  self.baseOffset = config.getParameter("baseOffset", {0, 0})
   self.weaponOffset = self.weaponOffset or {0, 0}
   self.oldWeaponOffset = self.weaponOffset
   self.newWeaponOffset = self.weaponOffset
@@ -77,7 +80,11 @@ function Weapon:update(dt, fireMode, shiftHeld)
     self.stanceTimer.progress = self.stanceTimer.current / self.stanceTimer.max
   end
 
-  mcontroller.setRotation(interp[self.stanceInterpolationMethod](self.stanceTimer.progress, 0, -2 * math.pi * (self.stance.flips or 0)))
+  mcontroller.setRotation(
+    self.aimDirection
+    * interp[self.stanceInterpolationMethod](self.stanceTimer.progress, 0, -2 * math.pi * (self.stance.flips or 0))
+  )
+
   if not mcontroller.groundMovement() then
     if self.stance.airborneControlVelocity then
       mcontroller.controlApproachVelocity(self.stance.airborneControlVelocity.velocity, self.stance.airborneControlVelocity.force)
@@ -164,7 +171,7 @@ function Weapon:screenShake(intensity)
   local offset = vec2.rotate({intensity, 0}, sb.nrand(math.pi, math.pi))
 
   local cam = world.spawnProjectile(
-    "screenshakeProjectile",
+    "project42neoscreenshakeprojectile",
     vec2.add(mcontroller.position(), offset),
     activeItem.ownerEntityId(),
     {1, 0},
@@ -298,6 +305,34 @@ function Weapon:setStance(stance)
 
   self.stanceProgress = stance.snap and 1 or 0
 
+end
+
+function Weapon:setDamage(damageConfig, damageArea, damageTimeout, offset, rotation)
+  if damageArea then
+    
+    --[[
+    damageArea = {
+      {-0.1, 0.1},
+      {0.1, 0.1},
+      {0.1, -0.1},
+      {-0.1, -0.1}
+    }
+    --]]
+
+    local mcRotation = mcontroller.rotation()
+    local mcDirection = mcontroller.facingDirection()
+    -- local handPos = vec2.rotate(activeItem.handPosition(), mcDirection * mcRotation)
+    local handPos = activeItem.handPosition()
+    
+    -- chat.addMessage(sb.printJson(handPos))
+
+    damageArea = poly.rotate(damageArea, rotation + mcRotation * mcDirection)
+    damageArea = poly.translate(damageArea, vec2.rotate(offset, mcRotation * mcDirection))
+
+  end
+  self.damageWasSet = true
+  self.damageCleared = false
+  activeItem.setItemDamageSources({ self:damageSource(damageConfig, damageArea, damageTimeout) })
 end
 
 function getShiftAbility()

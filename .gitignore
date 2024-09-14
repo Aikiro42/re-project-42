@@ -3,3 +3,4 @@ items/active/weapons/weapon.lua
 scripts/poly.lua
 scripts/vec2.lua
 scripts/util.lua
+scripts/interp.lua

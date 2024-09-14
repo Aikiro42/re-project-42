@@ -111,14 +111,17 @@ function Project42Neo:update(dt, fireMode, shiftHeld)
   self:__debug(dt, fireMode, shiftHeld)
 
   self.currentDamage.duration = math.max(0, self.currentDamage.duration - self.dt)
-  if self.currentDamage.duration == 0 then
+  if self.currentDamage.duration <= 0 then
     self.currentDamage.args = nil
   end
 
   if self.currentDamage.args then
     self.weapon:setDamage(
       self.currentDamage.args.damageConfig,
-      self.currentDamage.args.damageArea
+      self.currentDamage.args.damageArea,
+      nil,
+      self.currentDamage.args.damageOffset,
+      self.currentDamage.args.damageRotation
     )
   else
     self.weapon:setDamage()
@@ -403,16 +406,12 @@ function Project42Neo:damage(stance, isHeavy, stats)
   animator.rotateTransformationGroup("swoosh", rotation)
   animator.translateTransformationGroup("swoosh", offset)
 
-  self.currentDamage.duration = damageParameters.duration or 0.1
+  self.currentDamage.duration = damageParameters.duration or stance.duration or 0.1
   self.currentDamage.args = {
     damageConfig = damageConfig,
-    damageArea = poly.translate(
-      poly.rotate(
-        damageParameters.area or {},
-        rotation
-      ),
-      offset
-    )
+    damageArea = damageParameters.area or {},
+    damageOffset = offset,
+    damageRotation = rotation
   }
 
   --[[

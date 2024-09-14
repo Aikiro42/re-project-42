@@ -1,0 +1,21 @@
+{
+  "projectileName" : "project42neoparryprojectile",
+  "image" : "project42neoparryprojectile.png",
+  "scripts": ["/projectiles/project42neo/scripts/tracer.lua"],
+  "frameNumber" : 3,
+  "speed" : 100,
+  "damagePoly" : [[0, 0]],
+  "animationLoops" : false,
+  "fullbright": true,
+  "flippable" : true,
+  "damageKind" : "standardbullet",
+  "timeToLive": 3,
+
+  "tracerParameters": {
+    "color": [255, 64, 64],
+    "light": [64, 0, 0],
+    "fullbright": true,
+    "timeToLive": 0.3
+  }
+  
+}
