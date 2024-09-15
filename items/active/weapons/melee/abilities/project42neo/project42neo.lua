@@ -6,6 +6,10 @@ require "/items/active/weapons/project42neo-weapon.lua"
 
 Project42Neo = WeaponAbility:new()
 
+local print = function(str)
+  chat.addMessage(str)
+end
+
 function Project42Neo:__debug(dt, fireMode, shiftHeld)
   status.giveResource("health", 9999)
 end
@@ -110,24 +114,6 @@ function Project42Neo:update(dt, fireMode, shiftHeld)
 
   self:__debug(dt, fireMode, shiftHeld)
 
-  self.currentDamage.duration = math.max(0, self.currentDamage.duration - self.dt)
-  if self.currentDamage.duration <= 0 then
-    self.currentDamage.args = nil
-  end
-
-  if self.currentDamage.args then
-    self.weapon:setDamage(
-      self.currentDamage.args.damageConfig,
-      self.currentDamage.args.damageArea,
-      nil,
-      self.currentDamage.args.damageOffset,
-      self.currentDamage.args.damageRotation
-    )
-  else
-    self.weapon:setDamage()
-  end
-
-  
   self.currentShield.duration = math.max(0, self.currentShield.duration - self.dt)
   if self.currentShield.duration == 0 then
     self.currentShield.args = nil    
@@ -201,6 +187,7 @@ end
 -- states
 
 function Project42Neo:unsheathing()
+  print("unsheathing")
   self:setStanceSequence(self.idle.unsheathing, false, self.stats)
   self.weapon:setStance(self.idle.ready)
   animator.setParticleEmitterActive("blade", true)
@@ -208,6 +195,7 @@ function Project42Neo:unsheathing()
 end
 
 function Project42Neo:sheathing()
+  print("sheathing")
   self:setStanceSequence(self.idle.sheathing, false, self.stats)
   self.weapon:setStance(self.idle.sheathed)
   animator.setParticleEmitterActive("blade", false)
@@ -215,6 +203,7 @@ function Project42Neo:sheathing()
 end
 
 function Project42Neo:idling()
+  print("idling")
   self:setStanceSequence(self.idle.sequence, false, self.stats)
 end
 
@@ -223,6 +212,7 @@ function Project42Neo:attacking(attackKey, isHeavy)
   self.isAttacking = true
   self.idleTimer = self.idle.timeout
   -- attack
+  print("attack: " .. attackKey .. (isHeavy and "(heavy)" or ""))
   self:setStanceSequence(self.combo.attacks[attackKey].sequence, isHeavy, self.stats)
 
   -- if input is held down after attack, initiate heavy
@@ -364,9 +354,10 @@ function Project42Neo:setStanceSequence(stanceSequence, isHeavy, stats)
   if not stanceSequence then return end
   if #stanceSequence == 0 then return end
 
-  for i, stance in ipairs(stanceSequence) do
+  for i, s in ipairs(stanceSequence) do
+    local stance = copy(s)
     if stance.duration then
-      stance.duration = stance.duration / math.max(0.001, stats.attackSpeed)
+      stance.duration = math.max(0.05, stance.duration / math.max(0.001, stats.attackSpeed))
     end
     self.weapon:setStance(stance)
     self:damage(stance, isHeavy, stats)
@@ -406,6 +397,7 @@ function Project42Neo:damage(stance, isHeavy, stats)
   animator.rotateTransformationGroup("swoosh", rotation)
   animator.translateTransformationGroup("swoosh", offset)
 
+  --[[
   self.currentDamage.duration = damageParameters.duration or stance.duration or 0.1
   self.currentDamage.args = {
     damageConfig = damageConfig,
@@ -413,17 +405,14 @@ function Project42Neo:damage(stance, isHeavy, stats)
     damageOffset = offset,
     damageRotation = rotation
   }
+  --]]
 
-  --[[
   self.weapon:setDamage(
     damageConfig,
-    poly.translate(
-      poly.rotate(
-        damageParameters.area or {},
-        rotation
-      ),
-      offset
-    )
+    damageParameters.area,
+    nil,
+    offset,
+    rotation
   )
   --]]
 

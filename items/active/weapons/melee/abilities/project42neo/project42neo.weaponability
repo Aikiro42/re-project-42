@@ -13,6 +13,7 @@
         "/sfx/project42neo/default/swing6.ogg",
         "/sfx/project42neo/default/swing7.ogg"
       ],
+      "flipswing": ["/sfx/melee/flip_slash.ogg"],
       "sheath": ["/sfx/project42neo/default/sheath.ogg"]
     },
     "animatedParts": {
@@ -346,9 +347,11 @@
           "default": "upperdiagonalslash"
         },
         "heavy": {
+          "up": "flipslash",
           "default": "diagonalheavy"
         },
         "heavyAirborne": {
+          "up": "flipslash",
           "default": "plunge"
         }
       },
@@ -511,7 +514,7 @@
               "animationStates": {
                 "swoosh": "flipslash"
               },
-              "playSounds": ["swing"],
+              "playSounds": ["flipswing"],
               "damage": {
                 "config": {
                   "knockback": [0, 50],
