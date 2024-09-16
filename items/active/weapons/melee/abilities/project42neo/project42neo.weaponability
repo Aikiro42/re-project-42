@@ -165,6 +165,11 @@
     "comboGracePeriod": 1,
     "offsetParameter": "baseOffset",
 
+    "dodge": {
+      "duration": 0.3,
+      "cooldown": 0.5
+    },
+
     "globalDamageConfig": {
       "damageSourceKind": "default",
       "statusEffects": [],
@@ -324,7 +329,7 @@
     },
 
     "combo": {
-      // "debugAttack": "plunge",
+      "debugAttack": "plunge",
       "init": {
         "default": "verticalslash",
         "normal": {
@@ -505,11 +510,9 @@
               "snap": true,
               "weaponDirectives": "?flipy",
               "aimAngle": 0,
-              "momentum": [0, 100],
+              "velocity": [0, 10],
               "duration": 0.5,
               "flips": -3,
-              // "momentum": [0, 100],
-              // "duration": 0.3,
 
               "animationStates": {
                 "swoosh": "flipslash"
@@ -521,6 +524,7 @@
                   "timeout": 0.05
                 },
                 "multiplier": 0.8,
+                /*
                 "area": [
                   [-5, -2],
                   [-2.5, -3],
@@ -533,6 +537,20 @@
                 ],
                 "offset": [0, -1.75],
                 "rotation": 15
+                */
+                "area": [
+                  [6.00, 0.00],
+                  [4.24, 4.24],
+                  [0.00, 6.00],
+                  [-4.24, 4.24],
+                  [-6.00, 0.00],
+                  [-4.24, -4.24],
+                  [-0.00, -6.00],
+                  [4.24, -4.24]
+                ],
+                "offset": [-1, 0],
+                "rotation": -15,
+                "lock": true
               }
             },
             {
@@ -623,7 +641,7 @@
             "normalAirborne": {
               "default": "risingslash",
               "up": "horizontalslash",
-              "side": "risingslash",
+              "side": "horizontalslash",
               "down": "plunge"
             }
           }
@@ -682,6 +700,10 @@
           "next": {
             "normal": {
               "default": "stab"
+            },
+            "airborne": {
+              "default": "upperverticalslash",
+              "down": "plunge"
             }
           }
         },
@@ -740,11 +762,12 @@
           "sequence": [
             {
               "weaponRotation": -135,
-              "armRotation": 45,
+              "armRotation": 90,
               "weaponOffset": [-0.5, 0],
               "momentum": [0, 20],
               "twoHanded": true,
               "allowRotate": false,
+              "aimAngle": 0,
               "allowFlip": true,
               "weaponDirectives": "?flipy",
               "duration": 0.2
@@ -758,6 +781,7 @@
               "duration": 0.3,
               "aimAngle": 0,
               "momentum": [0, -100],
+              "weaponDirectives": "?flipy",
 
               "animationStates": {
                 "swoosh": "stab"

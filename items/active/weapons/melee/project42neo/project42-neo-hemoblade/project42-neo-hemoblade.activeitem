@@ -54,6 +54,11 @@
                   "image" : "/items/active/weapons/melee/project42neo/project42-neo-hemoblade/swoosh/verticalslash.png:<frame>?flipy"
                 }
               },
+              "flipslash" : {
+                "properties" : {
+                  "image" : "/items/active/weapons/melee/project42neo/project42-neo-hemoblade/swoosh/verticalslash.png:<frame>?flipy"
+                }
+              },
               "diagonalslash" : {
                 "properties" : {
                   "image" : "/items/active/weapons/melee/project42neo/project42-neo-hemoblade/swoosh/diagonalslash.png:<frame>"
@@ -120,7 +125,7 @@
   
   "primaryAbility": {
     "stats": {
-      "attackSpeed": 2,
+      "attackSpeed": 10,
       "baseDamage": 4.2,
       "critChance": 0.32,
       "critDamage": 2.2

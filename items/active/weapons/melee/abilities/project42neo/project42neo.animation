@@ -19,7 +19,14 @@
     "heavyReady": [ "/sfx/melee/sword_parry.ogg" ],
     "heavy": ["/sfx/melee/astraltear1.ogg", "/sfx/melee/astraltear2.ogg"],
 
-    "parry": [ "/sfx/melee/sword_parry.ogg" ]
+    "parry": [ "/sfx/melee/spear_hit_robotic.ogg" ],
+
+    "dodge": [
+      // "/sfx/melee/charge_full_swing1.ogg",
+      "/sfx/melee/swing_axe_fire1.ogg",
+      "/sfx/melee/swing_axe_fire2.ogg",
+      "/sfx/melee/swing_axe_fire3.ogg"
+    ]
     
   },
 

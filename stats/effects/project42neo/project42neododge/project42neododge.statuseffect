@@ -1,0 +1,16 @@
+{
+  "name" : "project42neododge",
+  "blockingStat" : "",
+
+  "effectConfig" : {},
+  "defaultDuration" : 0.1,
+
+  "scripts" : [
+    "project42neododge.lua"
+  ],
+
+  "animationConfig" : "project42neododge.animation",
+
+  "label" : "Dodging.",
+  "icon" : "/stats/effects/project42neo/project42neododge/project42neododge.png"
+}

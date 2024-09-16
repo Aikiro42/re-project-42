@@ -1,7 +1,8 @@
-require "/scripts/util.lua"
+require "/scripts/project42neo/util.lua"
 require "/scripts/poly.lua"
 require "/scripts/vec2.lua"
 require "/scripts/status.lua"
+require "/scripts/interp.lua"
 require "/items/active/weapons/project42neo-weapon.lua"
 
 Project42Neo = WeaponAbility:new()
@@ -31,6 +32,25 @@ function Project42Neo:init()
   self.idleTimer = -1
   self.heavyAttackTime = 0.3
 
+  self.dodge = sb.jsonMerge({
+    duration = 0.1,
+    cooldown = 0.5,
+    speed = 100
+  }, self.dodge or {})
+  self.dodgeListener = damageListener("damageTaken", function(notifications)
+    for _, notification in ipairs(notifications) do
+      if notification.hitType == "Hit"
+      and notification.damageDealt == 0
+      and notification.healthLost == 0 then
+        print("PERFECT DODGE!")
+      end
+    end
+  end)
+
+
+  self.dodgeTimer = self.dodge.cooldown
+  self.dodgeCounter = 2
+
   self.currentDamage = {
     duration = 0
   }
@@ -40,8 +60,8 @@ function Project42Neo:init()
       for _, notification in ipairs(notifications) do
         if notification.hitType == "ShieldHit" then
           animator.playSound("parry")
-          self.currentShield.duration = 0
-          self.currentShield.args = nil
+          self.currentShield.duration = 0.1
+          -- self.currentShield.args = nil
           break
         end
       end
@@ -113,19 +133,17 @@ function Project42Neo:update(dt, fireMode, shiftHeld)
   self.cooldownTimer = math.max(0, self.cooldownTimer - self.dt)
 
   self:__debug(dt, fireMode, shiftHeld)
+  self:updateShield()
+  self:updateDamage()
+  self:updateDodge()
 
-  self.currentShield.duration = math.max(0, self.currentShield.duration - self.dt)
-  if self.currentShield.duration == 0 then
-    self.currentShield.args = nil    
+  if not self:cancelling() then
+    self.cancelled = false
   end
 
-  if self.currentShield.args then
-    activeItem.setShieldPolys(self.currentShield.args.polys)
-    self.currentShield.listener:update()
-  else
-    activeItem.setShieldPolys()
+  if not self:triggering() then
+    self.triggered = false
   end
-
   
   if self.idleTimer > 0
   and not self.weapon.currentAbility
@@ -138,31 +156,94 @@ function Project42Neo:update(dt, fireMode, shiftHeld)
 
   if self.cooldownTimer <= 0
   and not self.weapon.currentAbility
-  and self:triggering()
   then
-    if animator.animationState("sheath") == "sheathed" then
-      self:setState(self.unsheathing)
-      self.idleTimer = self.idle.timeout
-    else
-      self:setState(self.attacking, self:getFirstStep())
-      self.idleTimer = self.idle.timeout
+    if self:triggering() then
+
+      if animator.animationState("sheath") == "sheathed" then
+        self:setState(self.unsheathing)
+      else
+        self:setState(self.attacking, self:getFirstStep())
+      end
+    elseif self:cancelling(true) then
+
+      if animator.animationState("sheath") == "sheathed" then
+        self:setState(self.unsheathing)
+      else
+        self:setState(self.dodging)
+      end
     end
+    self.idleTimer = self.idle.timeout
+
   end
 
 end
 
+function Project42Neo:updateShield()
+
+  self.currentShield.duration = self.currentShield.duration - self.dt
+  if self.currentShield.duration <= 0 then
+    self.currentShield.args = nil    
+  end
+
+  if self.currentShield.args then
+    activeItem.setShieldPolys(self.currentShield.args.polys)
+    self.currentShield.listener:update()
+  else
+    activeItem.setShieldPolys()
+  end
+
+end
+
+function Project42Neo:updateDamage()
+
+  self.currentDamage.duration = self.currentDamage.duration - self.dt
+  if self.currentDamage.duration <= 0 then
+    self.currentDamage.args = nil
+  end
+
+  if self.currentDamage.args then
+    self.weapon:setDamage(
+      self.currentDamage.args.damageConfig,
+      self.currentDamage.args.damageArea,
+      nil,
+      self.currentDamage.args.damageOffset or {0, 0},
+      self.currentDamage.args.damageRotation or 0,
+      self.currentDamage.args.damageLocked
+    )
+  else
+    self.weapon:setDamage()
+  end
+
+end
+
+function Project42Neo:updateDodge()
+  if self.dodgeTimer > 0 then
+    self.dodgeTimer = self.dodgeTimer - self.dt
+  else
+    self.dodgeCounter = 2
+  end
+end
+
 -- evaluative
 
-function Project42Neo:triggering()
-  return self.fireMode == (self.activatingFireMode or self.abilitySlot)
+function Project42Neo:triggering(triggered)
+  if triggered and not self.triggered then
+    self.triggered = true
+    return self.fireMode == (self.activatingFireMode or self.abilitySlot)
+  end
+  return self.fireMode == (self.activatingFireMode or self.abilitySlot) and not self.triggered
 end
 
 
-function Project42Neo:cancelling()
-  return self.fireMode == "alt"
+function Project42Neo:cancelling(cancelled)
+  if cancelled and not self.cancelled then
+    self.cancelled = true
+    return self.fireMode == "alt"
+  end
+  return self.fireMode == "alt" and not self.cancelled
 end
 
-function Project42Neo:cursorDirection()
+function Project42Neo:cursorDirection(specifySide)
   local aimAngle = activeItem.aimAngle(0, activeItem.ownerAimPosition())
   --[[
   if aimAngle < 0 then
@@ -180,6 +261,13 @@ function Project42Neo:cursorDirection()
   aimAngle = math.abs(aimAngle)
   if pi13 <= aimAngle and aimAngle <= pi23 then
     return tentativeDirection
+  end
+  if specifySide then
+    if aimAngle > pi23 then
+      return "left"
+    else
+      return "right"
+    end
   end
   return "side"
 end
@@ -213,7 +301,9 @@ function Project42Neo:attacking(attackKey, isHeavy)
   self.idleTimer = self.idle.timeout
   -- attack
   print("attack: " .. attackKey .. (isHeavy and "(heavy)" or ""))
-  self:setStanceSequence(self.combo.attacks[attackKey].sequence, isHeavy, self.stats)
+  self:setStanceSequence(self.combo.attacks[attackKey].sequence, isHeavy, self.stats, function()
+    self:setState(self.dodging)
+  end)
 
   -- if input is held down after attack, initiate heavy
   local triggered = self:triggering()
@@ -230,6 +320,8 @@ function Project42Neo:transisting(attackKey)
   -- otherwise, initiate grace period
   local gracePeriod = self.comboGracePeriod
   while gracePeriod > 0 do
+
+    self:maintainAir()
     
     -- tick down grace period
     gracePeriod = gracePeriod - self.dt
@@ -242,8 +334,9 @@ function Project42Neo:transisting(attackKey)
     
     -- if cancelled within grace period, reset
     elseif self:cancelling() then
-      animator.burstParticleEmitter("charge")
-      break
+      print("CANCELLED (transisting)")
+      self:setState(self.dodging)
+      return
     end
 
     coroutine.yield()
@@ -317,6 +410,32 @@ function Project42Neo:resetting(attackKey)
   self.isAttacking = false
 end
 
+function Project42Neo:dodging()
+  if self.dodgeCounter <= 0 then return end
+  
+  self.dodgeCounter = self.dodgeCounter - 1
+  self.dodgeTimer = self.dodge.cooldown
+  
+  -- determine dodge direction
+  local direction = mcontroller.xVelocity() < -0 and -1 or 1
+  if direction == 0 then direction = ({left=-1, right=1})[self:cursorDirection(true)] end
+
+  self.weapon:setStance(self.idle.ready)
+  status.addEphemeralEffect("project42neododge", self.dodge.duration)
+  animator.playSound("dodge")
+  util.wait(self.dodge.duration, function(dt, timer)
+    local progress = timer / self.dodge.duration
+    self.dodgeListener:update()
+    mcontroller.setVelocity({
+      interp.sin(progress, 0, direction * self.dodge.speed),
+      0
+    })
+  end)
+    
+  self.weapon:setStance(self.idle.ready)
+
+end
+
 -- actions
 
 function Project42Neo:getFirstStep()
@@ -350,20 +469,40 @@ function Project42Neo:getNextStep(attackKey, isHeavy)
 
 end
 
-function Project42Neo:setStanceSequence(stanceSequence, isHeavy, stats)
+function Project42Neo:maintainAir(controlVelocity, controlForce)
+  controlVelocity = controlVelocity or {0, 5}
+  controlForce = controlForce or 9999
+  if not mcontroller.onGround() and world.gravity(mcontroller.position()) > 0 then
+    mcontroller.controlApproachVelocity(controlVelocity, controlForce)
+  end
+end
+
+function Project42Neo:setStanceSequence(stanceSequence, isHeavy, stats, cancelCallback)
   if not stanceSequence then return end
   if #stanceSequence == 0 then return end
 
-  for i, s in ipairs(stanceSequence) do
-    local stance = copy(s)
+  local i = 1
+  while i <= #stanceSequence do
+    local stance = copy(stanceSequence[i])
     if stance.duration then
-      stance.duration = math.max(0.05, stance.duration / math.max(0.001, stats.attackSpeed))
+      stance.duration = math.max((stance.damage or stance.shield) and 0.05 or 0, stance.duration / math.max(0.001, stats.attackSpeed))
     end
     self.weapon:setStance(stance)
     self:damage(stance, isHeavy, stats)
     self:shield(stance)
     self:projectile(stance)
-    util.wait(stance.duration or 0)
+    util.wait(stance.duration or 0, function()
+      self:maintainAir()
+      if self:cancelling(true) and cancelCallback then
+        print("CANCELED (in stance)")
+        stanceSequence = {}
+        i = 1
+        isHeavy = false
+        cancelCallback()
+        return
+      end
+    end)
+    i = i + 1
     coroutine.yield()
   end
 end
@@ -397,24 +536,14 @@ function Project42Neo:damage(stance, isHeavy, stats)
   animator.rotateTransformationGroup("swoosh", rotation)
   animator.translateTransformationGroup("swoosh", offset)
 
-  --[[
   self.currentDamage.duration = damageParameters.duration or stance.duration or 0.1
   self.currentDamage.args = {
     damageConfig = damageConfig,
     damageArea = damageParameters.area or {},
     damageOffset = offset,
-    damageRotation = rotation
+    damageRotation = rotation,
+    damageLocked = damageParameters.lock
   }
-  --]]
-
-  self.weapon:setDamage(
-    damageConfig,
-    damageParameters.area,
-    nil,
-    offset,
-    rotation
-  )
-  --]]
 
 end
 
@@ -450,8 +579,29 @@ end
 function Project42Neo:projectile(stance)
   if not stance then return end
   if not stance.projectile then return end
+  if not stance.projectile.type then return end
 
+  local baseAimAngle = activeItem.aimAngle(0, activeItem.ownerAimPosition())
+  local aimAngle = stance.projectile.aimAngleOverride
+    or baseAimAngle + (stance.projectile.aimAngle or 0)
+  local aimDirection = vec2.rotate({1, 0}, aimAngle)
 
+  local spawnPos = vec2.add(
+    mcontroller.position(),
+    vec2.rotate(
+      stance.projectile.offset or {0, 0},
+      baseAimAngle
+    )
+  )
+
+  world.spawnProjectile(
+    stance.projectile.type,
+    spawnPos,
+    activeItem.ownerEntityId(),
+    aimDirection,
+    stance.projectile.track,
+    stance.projectile.parameters
+  )
 
 end
 

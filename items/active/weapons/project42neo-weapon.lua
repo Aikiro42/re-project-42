@@ -307,7 +307,7 @@ function Weapon:setStance(stance)
 
 end
 
-function Weapon:setDamage(damageConfig, damageArea, damageTimeout, offset, rotation)
+function Weapon:setDamage(damageConfig, damageArea, damageTimeout, offset, rotation, lockRotation)
   if damageArea then
     
     --[[
@@ -321,13 +321,8 @@ function Weapon:setDamage(damageConfig, damageArea, damageTimeout, offset, rotat
 
     local mcRotation = mcontroller.rotation()
     local mcDirection = mcontroller.facingDirection()
-    -- local handPos = vec2.rotate(activeItem.handPosition(), mcDirection * mcRotation)
-    local handPos = activeItem.handPosition()
-    
-    -- chat.addMessage(sb.printJson(handPos))
-
-    damageArea = poly.rotate(damageArea, rotation + mcRotation * mcDirection)
-    damageArea = poly.translate(damageArea, vec2.rotate(offset, mcRotation * mcDirection))
+    damageArea = poly.rotate(damageArea, rotation + (lockRotation and 0 or mcRotation * mcDirection))
+    damageArea = poly.translate(damageArea, vec2.rotate(offset, lockRotation and 0 or mcRotation * mcDirection))
 
   end
   self.damageWasSet = true

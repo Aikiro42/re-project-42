@@ -8,7 +8,7 @@ def pixelCoorsToStarbound(dimensions, points):
     print(f"[{x/8}, {y/8}],")
 
 
-def circleDamageArea(radius, segments, offset):
+def circleDamageArea(radius, segments, offset=(0,0)):
   angleIncrement = 2*pi/segments
   for i in range(segments):
     x = radius * cos(angleIncrement * i) + offset[0]
@@ -24,5 +24,5 @@ if __name__ == "__main__":
     (0, 18),
   ]
   # pixelCoorsToStarbound(dimensions, points)
-  circleDamageArea(6, 8, [3, 2])
+  circleDamageArea(6, 8)
 
