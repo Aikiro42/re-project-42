@@ -470,11 +470,14 @@ function Project42Neo:getNextStep(attackKey, isHeavy)
 end
 
 function Project42Neo:maintainAir(controlVelocity, controlForce)
+  return
+  --[[
   controlVelocity = controlVelocity or {0, 5}
   controlForce = controlForce or 9999
   if not mcontroller.onGround() and world.gravity(mcontroller.position()) > 0 then
     mcontroller.controlApproachVelocity(controlVelocity, controlForce)
   end
+  ]]
 end
 
 function Project42Neo:setStanceSequence(stanceSequence, isHeavy, stats, cancelCallback)
@@ -535,14 +538,11 @@ function Project42Neo:damage(stance, isHeavy, stats)
   animator.resetTransformationGroup("swoosh")
   animator.rotateTransformationGroup("swoosh", rotation)
   animator.translateTransformationGroup("swoosh", offset)
-
+  
   self.currentDamage.duration = damageParameters.duration or stance.duration or 0.1
   self.currentDamage.args = {
     damageConfig = damageConfig,
-    damageArea = damageParameters.area or {},
-    damageOffset = offset,
-    damageRotation = rotation,
-    damageLocked = damageParameters.lock
+    damageArea = animator.partPoly("swoosh", "damageArea")
   }
 
 end

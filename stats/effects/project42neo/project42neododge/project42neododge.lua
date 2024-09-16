@@ -33,6 +33,8 @@ function update(dt)
   if self.lastShieldHealth > status.resource("damageAbsorption") then
     animator.playSound("hit")
     self.lastShieldHealth = status.resource("damageAbsorption")
+    status.addEphemeralEffect("project42neoperfectdodge")
+    effect.expire()
   end
 
   -- particles

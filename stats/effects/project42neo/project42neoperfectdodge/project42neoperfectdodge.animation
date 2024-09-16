@@ -1,0 +1,33 @@
+{
+  "particleEmitters" : {
+    "dodgeRight" : {
+      "emissionRate" : 2,
+      "particles" : [
+        {
+          "particle" : "project42neoperfectdodge1",
+          "flip" : true
+        },
+        {
+          "particle" : "project42neoperfectdodge2",
+          "flip" : true
+        }
+      ]
+    },
+    "dodgeLeft" : {
+      "emissionRate" : 2,
+      "particles" : [
+        {
+          "particle" : "project42neoperfectdodgeleft1",
+          "flip" : true
+        },
+        {
+          "particle" : "project42neoperfectdodgeleft2",
+          "flip" : true
+        }
+      ]
+    }
+  },
+  "sounds" : {
+    "activate": []
+  }
+}

@@ -77,52 +77,118 @@
             "swoosh": {
               "verticalslash": {
                 "properties": {
-                  "image": "/items/active/weapons/melee/abilities/project42neo/swoosh/verticalslash.png:<frame>"
+                  "image": "/items/active/weapons/melee/abilities/project42neo/swoosh/verticalslash.png:<frame>",
+                  "damageArea": [
+                    [-5, 2],
+                    [-2.5, 3],
+                    [1, 3],
+                    [4, 1.75],
+                    [5, -0.25],
+                    [5, -2.25],
+                    [4, -3.25],
+                    [0, -2.5]
+                  ]
                 }
               },
               "upperverticalslash": {
                 "properties": {
-                  "image": "/items/active/weapons/melee/abilities/project42neo/swoosh/verticalslash.png:<frame>?flipy"
+                  "image": "/items/active/weapons/melee/abilities/project42neo/swoosh/verticalslash.png:<frame>?flipy",
+                  "damageArea": [
+                    [-5, -2],
+                    [-2.5, -3],
+                    [1, -3],
+                    [4, -1.75],
+                    [5, 0.25],
+                    [5, 2.25],
+                    [4, 3.25],
+                    [0, 2.5]
+                  ]
                 }
               },
               "flipslash": {
                 "properties": {
-                  "image": "/items/active/weapons/melee/abilities/project42neo/swoosh/verticalslash.png:<frame>?flipy"
+                  "image": "/items/active/weapons/melee/abilities/project42neo/swoosh/verticalslash.png:<frame>?flipy",
+                  "damageArea": [
+                    [6.00, 0.00],
+                    [4.24, 4.24],
+                    [0.00, 6.00],
+                    [-4.24, 4.24],
+                    [-6.00, 0.00],
+                    [-4.24, -4.24],
+                    [-0.00, -6.00],
+                    [4.24, -4.24]
+                  ]  
                 }
               },
               "diagonalslash": {
                 "properties": {
-                  "image": "/items/active/weapons/melee/abilities/project42neo/swoosh/diagonalslash.png:<frame>"
+                  "image": "/items/active/weapons/melee/abilities/project42neo/swoosh/diagonalslash.png:<frame>",
+                  "damageArea": [
+                    [-2.0, 3.125],
+                    [0.375, 3.125],
+                    [4.25, 2.125],
+                    [6.75, 0.375],
+                    [6.75, -0.75],
+                    [6.75, -0.75],
+                    [5.875, -1.625],
+                    [2.625, -2.5],
+                    [-2.375, -2.75],
+                    [-6.75, -1.75]
+                  ]
                 }
               },
               "upperdiagonalslash": {
                 "properties": {
-                  "image": "/items/active/weapons/melee/abilities/project42neo/swoosh/diagonalslash.png:<frame>?flipy"
+                  "image": "/items/active/weapons/melee/abilities/project42neo/swoosh/diagonalslash.png:<frame>?flipy",
+                  "damageArea": [
+                    [-2.0, -3.125],
+                    [0.375, -3.125],
+                    [4.25, -2.125],
+                    [6.75, -0.375],
+                    [6.75, 0.75],
+                    [6.75, 0.75],
+                    [5.875, 1.625],
+                    [2.625, 2.5],
+                    [-2.375, 2.75],
+                    [-6.75, 1.75]
+                  ]  
                 }
               },
               "stab": {
                 "properties": {
-                  "image": "/items/active/weapons/melee/abilities/project42neo/swoosh/stab.png:<frame>"
+                  "image": "/items/active/weapons/melee/abilities/project42neo/swoosh/stab.png:<frame>",
+                  "damageArea": [
+                    [-4.75, 1.5],
+                    [3, 1],
+                    [3, -1],
+                    [-4.75, -1.5]
+                  ]  
                 }
               },
               "horizontalslash": {
                 "properties": {
                   "image": "/items/active/weapons/melee/abilities/project42neo/swoosh/horizontalslash.png:<frame>",
-                  "offset": [-2.75, -0.5],
                   "damageArea": [
-                    [6.875, -1.0625],
-                    [-0.75, -1.0625],
-                    [-5.25, -0.6875],
-                    [-7.0, -0.0625],
-                    [-1.5, 0.9375],
-                    [1.0, 0.9375],
-                    [-2.125, 0.0625]
+                    [0.375, 0.9375],
+                    [1.875, 0.9375],
+                    [6.75, 0.0625],
+                    [3.5, -0.6875],
+                    [-6.0, -0.8125],
+                    [-6.875, -0.6875],
+                    [-0.25, -0.1875],
+                    [2.125, 0.1875]
                   ]
                 }
               },
               "risingslash": {
                 "properties": {
-                  "image": "/items/active/weapons/melee/abilities/project42neo/swoosh/risingslash.png:<frame>"
+                  "image": "/items/active/weapons/melee/abilities/project42neo/swoosh/risingslash.png:<frame>",
+                  "damageArea": [
+                    [3.0, -2.875],
+                    [3.0, 3.0],
+                    [-0.625, 2.75],
+                    [-3.125, 0.75]
+                  ]  
                 }
               }
             }
@@ -166,7 +232,7 @@
     "offsetParameter": "baseOffset",
 
     "dodge": {
-      "duration": 0.3,
+      "duration": 0.15,
       "cooldown": 0.5
     },
 
@@ -246,16 +312,6 @@
               "knockback": 40,
               "timeout": 0.1
             },
-            "area": [
-              [-5, -2],
-              [-2.5, -3],
-              [1, -3],
-              [4, -1.75],
-              [5, 0.25],
-              [5, 2.25],
-              [4, 3.25],
-              [0, 2.5]
-            ],
             "offset": [2, -1.75],
             "rotation": -15
           },
@@ -329,7 +385,7 @@
     },
 
     "combo": {
-      "debugAttack": "plunge",
+      // "debugAttack": "plunge",
       "init": {
         "default": "verticalslash",
         "normal": {
@@ -394,16 +450,6 @@
               "playSounds": ["swing"],
               "damage": {
                 "multiplier": 0.8,
-                "area": [
-                  [-5, -2],
-                  [-2.5, -3],
-                  [1, -3],
-                  [4, -1.75],
-                  [5, 0.25],
-                  [5, 2.25],
-                  [4, 3.25],
-                  [0, 2.5]
-                ],
                 "offset": [1, -1.75],
                 "rotation": -15
               },
@@ -454,16 +500,6 @@
               "playSounds": ["swing"],
               "damage": {
                 "multiplier": 1.25,
-                "area": [
-                  [-5, 2],
-                  [-2.5, 3],
-                  [1, 3],
-                  [4, 1.75],
-                  [5, -0.25],
-                  [5, -2.25],
-                  [4, -3.25],
-                  [0, -2.5]
-                ],
                 "offset": [-0.375, 1.75],
                 "rotation": 45
               },
@@ -510,7 +546,7 @@
               "snap": true,
               "weaponDirectives": "?flipy",
               "aimAngle": 0,
-              "velocity": [0, 10],
+              "velocity": [0, 50],
               "duration": 0.5,
               "flips": -3,
 
@@ -524,30 +560,6 @@
                   "timeout": 0.05
                 },
                 "multiplier": 0.8,
-                /*
-                "area": [
-                  [-5, -2],
-                  [-2.5, -3],
-                  [1, -3],
-                  [4, -1.75],
-                  [5, 0.25],
-                  [5, 2.25],
-                  [4, 3.25],
-                  [0, 2.5]
-                ],
-                "offset": [0, -1.75],
-                "rotation": 15
-                */
-                "area": [
-                  [6.00, 0.00],
-                  [4.24, 4.24],
-                  [0.00, 6.00],
-                  [-4.24, 4.24],
-                  [-6.00, 0.00],
-                  [-4.24, -4.24],
-                  [-0.00, -6.00],
-                  [4.24, -4.24]
-                ],
                 "offset": [-1, 0],
                 "rotation": -15,
                 "lock": true
@@ -607,18 +619,6 @@
               "playSounds": ["swing"],
               "damage": {
                 "multiplier": 1,
-                "area": [
-                  [-2.0, -3.125],
-                  [0.375, -3.125],
-                  [4.25, -2.125],
-                  [6.75, -0.375],
-                  [6.75, 0.75],
-                  [6.75, 0.75],
-                  [5.875, 1.625],
-                  [2.625, 2.5],
-                  [-2.375, 2.75],
-                  [-6.75, 1.75]
-                ],
                 "offset": [1.5, -2.125],
                 "rotation": -90
               },
@@ -672,16 +672,6 @@
               "playSounds": ["swing"],
               "damage": {
                 "multiplier": 1,
-                "area": [
-                  [0.375, 0.9375],
-                  [1.875, 0.9375],
-                  [6.75, 0.0625],
-                  [3.5, -0.6875],
-                  [-6.0, -0.8125],
-                  [-6.875, -0.6875],
-                  [-0.25, -0.1875],
-                  [2.125, 0.1875]
-                ],
                 "offset": [2, 0],
                 "rotation": 165
               },
@@ -736,12 +726,6 @@
                 "config": {
                   "damageSourceKind": "spear"
                 },
-                "area": [
-                  [-4.75, 1.5],
-                  [3, 1],
-                  [3, -1],
-                  [-4.75, -1.5]
-                ],
                 "offset": [2, 0]
               }
             },
@@ -792,12 +776,6 @@
                 "config": {
                   "damageSourceKind": "spear"
                 },
-                "area": [
-                  [-4.75, 1.5],
-                  [3, 3],
-                  [3, -3],
-                  [-4.75, -1.5]
-                ],
                 "offset": [5, 0],
                 "rotation": -90
               }
@@ -834,8 +812,6 @@
               "allowFlip": true,
               "snap": true,
               "duration": 0.1,
-              "momentum": [0, 50],
-              "aimMomentum": true,
               "weaponDirectives": "?flipy",
 
               "animationStates": {
@@ -844,12 +820,6 @@
               "playSounds": ["swing"],
               "damage": {
                 "multiplier": 0.5,
-                "area": [
-                  [3.0, -2.875],
-                  [3.0, 3.0],
-                  [-0.625, 2.75],
-                  [-3.125, 0.75]
-                ],
                 "offset": [2, -1.25],
                 "rotation": -75
               },
@@ -905,18 +875,6 @@
                 "config": {
                   "knockback": 40
                 },
-                "area": [
-                  [-2.0, 3.125],
-                  [0.375, 3.125],
-                  [4.25, 2.125],
-                  [6.75, 0.375],
-                  [6.75, -0.75],
-                  [6.75, -0.75],
-                  [5.875, -1.625],
-                  [2.625, -2.5],
-                  [-2.375, -2.75],
-                  [-6.75, -1.75]
-                ],
                 "offset": [1, 0],
                 "rotation": 135
               },

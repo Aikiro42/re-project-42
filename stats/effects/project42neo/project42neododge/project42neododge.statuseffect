@@ -9,8 +9,5 @@
     "project42neododge.lua"
   ],
 
-  "animationConfig" : "project42neododge.animation",
-
-  "label" : "Dodging.",
-  "icon" : "/stats/effects/project42neo/project42neododge/project42neododge.png"
+  "animationConfig" : "project42neododge.animation"
 }

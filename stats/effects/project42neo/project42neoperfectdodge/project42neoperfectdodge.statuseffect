@@ -1,0 +1,14 @@
+{
+  "name" : "project42neoperfectdodge",
+  "effectConfig" : {
+  },
+  "defaultDuration" : 0.5,
+
+  "scripts" : [
+    "project42neoperfectdodge.lua"
+  ],
+  "animationConfig" : "project42neoperfectdodge.animation",
+
+  "label" : "Perfect Dodge",
+  "icon" : "/stats/effects/project42neo/project42neoperfectdodge/project42neoperfectdodge.png"
+}

@@ -26,7 +26,7 @@ function init()
 
   self.screenShakeListener = damageListener("inflictedDamage", function(notifications)
     if #notifications > 0 then
-      sb.logInfo(sb.printJson(notifications, 1))
+      -- sb.logInfo(sb.printJson(notifications, 1))
       self.weapon:screenShake(0.5)
     end
   end)

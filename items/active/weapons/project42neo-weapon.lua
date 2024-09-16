@@ -307,24 +307,16 @@ function Weapon:setStance(stance)
 
 end
 
-function Weapon:setDamage(damageConfig, damageArea, damageTimeout, offset, rotation, lockRotation)
+function Weapon:setDamage(damageConfig, damageArea, damageTimeout)
+-- function Weapon:setDamage(damageConfig, damageArea, damageTimeout, offset, rotation, lockRotation)
+  --[[
   if damageArea then
-    
-    --[[
-    damageArea = {
-      {-0.1, 0.1},
-      {0.1, 0.1},
-      {0.1, -0.1},
-      {-0.1, -0.1}
-    }
-    --]]
-
     local mcRotation = mcontroller.rotation()
     local mcDirection = mcontroller.facingDirection()
     damageArea = poly.rotate(damageArea, rotation + (lockRotation and 0 or mcRotation * mcDirection))
     damageArea = poly.translate(damageArea, vec2.rotate(offset, lockRotation and 0 or mcRotation * mcDirection))
-
   end
+  --]]
   self.damageWasSet = true
   self.damageCleared = false
   activeItem.setItemDamageSources({ self:damageSource(damageConfig, damageArea, damageTimeout) })
