@@ -413,7 +413,9 @@
         },
         "heavyAirborne": {
           "up": "flipslash",
-          "default": "plunge"
+          "down": "plunge",
+          "side": "teleportSlash",
+          "default": "diagonalheavy"
         }
       },
 
@@ -887,6 +889,75 @@
                 ],
                 "offset": [0.25, -0.5],
                 "duration": 0.5
+              }
+              /*
+                "projectiles": [
+                  {
+                    "type": "firespinswoosh"
+                  },
+                  {
+                    "type": "electricspinswoosh",
+                    "aimAngle": 15
+                  },
+                  {
+                    "type": "icespinswoosh",
+                    "aimAngle": -15
+                  }
+                ]
+                //*/
+            }
+          ],
+          "next": {
+            "normal": {
+              "default": "upperdiagonalslash"
+            }
+          }
+        },
+        "teleportSlash": {
+          "sequence": [
+            {
+              "allowRotate": true,
+              "allowFlip": true,
+              "twoHanded": true,
+              "weaponRotation": 90,
+              "armRotation": 90,
+              "duration": 0.2
+            },
+            {
+              "allowRotate": false,
+              "allowFlip": false,
+              "twoHanded": true,
+              "snap": true,
+              "weaponRotation": -30,
+              "armRotation": -135,
+              "duration": 0.1,
+              "aimMomentum": true,
+              "momentum": [50, 0],
+
+              "animationStates": {
+                "swoosh": "diagonalslash"
+              },
+              "playSounds": ["swing"],
+              "damage": {
+                "multiplier": 1.5,
+                "config": {
+                  "knockback": 40
+                },
+                "offset": [1, 0],
+                "rotation": 135
+              },
+              "shield": {
+                "area": [
+                  [0, -2],
+                  [0, 2],
+                  [6, 2.5],
+                  [6, -2.5]
+                ],
+                "offset": [0.25, -0.5],
+                "duration": 0.5
+              },
+              "teleport": {
+                "delta": 50
               }
               /*
                 "projectiles": [

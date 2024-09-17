@@ -23,6 +23,7 @@ function Project42Neo:__debugUpdate(dt, fireMode, shiftHeld)
 
   status.giveResource("health", 9999)
   
+  --[[
   local debugOrigin = mcontroller.position()
   local debugDestination = activeItem.ownerAimPosition()
   debugDestination = world.lineCollision(debugOrigin, debugDestination, {"Block", "Dynamic"}) or debugDestination
@@ -31,8 +32,11 @@ function Project42Neo:__debugUpdate(dt, fireMode, shiftHeld)
   if correctedDest then
     world.debugLine(debugOrigin, correctedDest, "cyan")
   end
+  --]]
   
 end
+
+-- SECTION: [MAIN] ______________________________________________________________________________________
 
 function Project42Neo:init()
   
@@ -49,6 +53,7 @@ function Project42Neo:init()
   -- timers
   self.cooldownTimer = self.cooldown
   self.idleTimer = -1
+  self.__maintainAirTimer = 0
   self.heavyAttackTime = 0.3
 
   self.dodge = sb.jsonMerge({
@@ -189,6 +194,12 @@ function Project42Neo:update(dt, fireMode, shiftHeld)
 
 end
 
+function Project42Neo:uninit()
+  self.weapon:setDamage()
+end
+
+-- SECTION: [UPDATE] ____________________________________________________________________________________
+
 function Project42Neo:updateShield()
 
   self.currentShield.duration = self.currentShield.duration - self.dt
@@ -235,7 +246,21 @@ function Project42Neo:updateDodge()
   end
 end
 
--- evaluative
+function Project42Neo:maintainAir(stopTime, maxControlForce, controlVelocity)
+  stopTime = math.max(0.05, stopTime or 5)
+  maxControlForce = maxControlForce or 500
+  controlVelocity = controlVelocity or {0, 0}
+  
+  if mcontroller.onGround() then
+    self.__maintainAirTimer = 0
+  else
+    self.__maintainAirTimer = math.min(self.__maintainAirTimer + self.dt, stopTime)
+    mcontroller.controlApproachVelocity(controlVelocity, maxControlForce * self.__maintainAirTimer / stopTime)
+  end
+
+end
+
+-- SECTION: [EVALUATIVE] ________________________________________________________________________________
 
 function Project42Neo:triggering(triggered)
   if triggered and not self.triggered then
@@ -288,7 +313,7 @@ function Project42Neo:cursorDirection(specifySide)
   return "side"
 end
 
--- states
+-- SECTION: [STATES] ____________________________________________________________________________________
 
 function Project42Neo:unsheathing()
   print("unsheathing")
@@ -336,8 +361,6 @@ function Project42Neo:transisting(attackKey)
   -- otherwise, initiate grace period
   local gracePeriod = self.comboGracePeriod
   while gracePeriod > 0 do
-
-    self:maintainAir()
     
     -- tick down grace period
     gracePeriod = gracePeriod - self.dt
@@ -373,6 +396,11 @@ function Project42Neo:charging(attackKey)
   if self.combo.attacks[attackKey].autoFireHeavy == nil then
     self.combo.attacks[attackKey].autoFireHeavy = false
   end
+
+  if self.combo.attacks[attackKey].maintainAir == nil then
+    self.combo.attacks[attackKey].maintainAir = true
+  end
+
   animator.playSound("heavyLoop", -1)
 
   local chargingStance = sb.jsonMerge(self.weapon.stance, {
@@ -391,6 +419,10 @@ function Project42Neo:charging(attackKey)
     heavyAttackTimer = math.max(0, heavyAttackTimer - self.dt)
     progress = math.min(1, 1 - (heavyAttackTimer/self.heavyAttackTime))
     animator.setSoundVolume("heavyLoop", progress)
+
+    if self.combo.attacks[attackKey].maintainAir then
+      self:maintainAir()
+    end
 
     if heavyAttackTimer <= 0 then
       if not heavyReady then
@@ -453,7 +485,7 @@ function Project42Neo:dodging()
 
 end
 
--- actions
+-- SECTION: [ACTIONS] ___________________________________________________________________________________
 
 function Project42Neo:getFirstStep()
   local nexts = self.combo.init
@@ -486,17 +518,6 @@ function Project42Neo:getNextStep(attackKey, isHeavy)
 
 end
 
-function Project42Neo:maintainAir(controlVelocity, controlForce)
-  return
-  --[[
-  controlVelocity = controlVelocity or {0, 5}
-  controlForce = controlForce or 9999
-  if not mcontroller.onGround() and world.gravity(mcontroller.position()) > 0 then
-    mcontroller.controlApproachVelocity(controlVelocity, controlForce)
-  end
-  ]]
-end
-
 function Project42Neo:setStanceSequence(stanceSequence, isHeavy, stats, cancelCallback)
   if not stanceSequence then return end
   if #stanceSequence == 0 then return end
@@ -511,9 +532,8 @@ function Project42Neo:setStanceSequence(stanceSequence, isHeavy, stats, cancelCa
     self.weapon:setStance(stance)
     self:damage(stance, isHeavy, stats)
     self:shield(stance)
-    self:projectile(stance)
+    self:projectiles(stance)
     util.wait(stance.duration or 0, function()
-      self:maintainAir()
       if self:cancelling(true) and cancelCallback then
         print("CANCELED (in stance)")
         stanceSequence = {}
@@ -594,32 +614,58 @@ function Project42Neo:shield(stance)
 
 end
 
-function Project42Neo:projectile(stance)
-  if not stance then return end
-  if not stance.projectile then return end
-  if not stance.projectile.type then return end
+function Project42Neo:projectiles(stance)
+  if not stance then return nil end
+  if not stance.projectiles then return nil end
 
-  local baseAimAngle = activeItem.aimAngle(0, activeItem.ownerAimPosition())
-  local aimAngle = stance.projectile.aimAngleOverride
-    or baseAimAngle + (stance.projectile.aimAngle or 0)
-  local aimDirection = vec2.rotate({1, 0}, aimAngle)
+  --[[
+  "projectiles": [
+    {
+      "type": "standardbullet", // non-null
+      "aimAngleOverride": 0
+      "aimAngle": 0,
+      "offset": [0, 0],
+      "track": false,
+      "parameters": {...},
+      "cam": false
+    },
+    {...}
+  ]
+  --]]
 
-  local spawnPos = vec2.add(
-    mcontroller.position(),
-    vec2.rotate(
-      stance.projectile.offset or {0, 0},
-      baseAimAngle
-    )
-  )
+  local mainProjectile = nil
+  for _, projectile in ipairs(stance.projectiles) do
+    if projectile.type then
+      local baseAimAngle = activeItem.aimAngle(0, activeItem.ownerAimPosition())
+      local aimAngle = projectile.aimAngleOverride
+      or baseAimAngle + (projectile.aimAngle or 0)
+      local aimDirection = vec2.rotate({1, 0}, aimAngle)
+      local spawnPos = vec2.add(
+        mcontroller.position(),
+        vec2.rotate(
+          stance.projectile.offset or {0, 0},
+          baseAimAngle
+        )
+      )
 
-  world.spawnProjectile(
-    stance.projectile.type,
-    spawnPos,
-    activeItem.ownerEntityId(),
-    aimDirection,
-    stance.projectile.track,
-    stance.projectile.parameters
-  )
+      local projectileId = world.spawnProjectile(
+        stance.projectile.type,
+        spawnPos,
+        activeItem.ownerEntityId(),
+        aimDirection,
+        stance.projectile.track,
+        stance.projectile.parameters
+      )
+
+      if projectile.cam then
+        self.weapon:setCameraFocusEntity(projectileId, true)
+      end
+
+      mainProjectile = mainProjectile or projectileId
+    end
+  end
+
+  return mainProjectile
 
 end
 
@@ -630,18 +676,64 @@ function Project42Neo:teleport(stance)
 
   --[[
   "teleport": {
-    "delta": [0, 0], // if number, rotate {delta, 0} by aimAngle; if vector, use it as offset
+    "pause": {
+      "duration": 0,
+      "effects": []
+    }, // turn wielder invisible and wait for this duration
+    "delta": [0, 0],
+      // if number, rotate {delta, 0} by aimAngle, cap to aimPosition;
+      // if vector, use it as offset
+    "correctionThreshold": 5,
     "endVelocity": 0 // if nil, maintain velocity; if number, multiply maintained velocity; if vector, set velocity
-    "projectile": {...projectile}
   }
   --]]
   
-  self:projectile(stance.teleport.projectile)
-  
   local offset = stance.teleport.delta
-  
-end
+  if type(offset) == "number" then
+    local tentativeOffset = vec2.rotate({offset, 0}, activeItem.aimAngle(0, activeItem.ownerAimPosition()))
+    local aimOffset = vec2.sub(activeItem.ownerAimPosition(), mcontroller.position())
+    offset = vec2.mag(aimOffset) < vec2.mag(tentativeOffset) and aimOffset or tentativeOffset
+  end
 
-function Project42Neo:uninit()
-  self.weapon:setDamage()
+  local endVelocity = stance.teleport.endVelocity or mcontroller.velocity()
+  if type(endVelocity) == "number" then
+    endVelocity = vec2.mul(mcontroller.velocity(), endVelocity)
+  end
+
+  local origin = mcontroller.position()
+  local dest = vec2.add(origin, offset)
+  dest = util.correctCollision(mcontroller.collisionPoly(), origin, dest, stance.teleport.correctionThreshold)
+
+  local projectile
+  if stance.teleport.projectile then
+    projectile = {
+      projectiles = {
+        stance.teleport.projectile
+      }
+    }
+  end
+
+  if dest then
+    world.spawnProjectile(
+      "project42neoscreenshakeprojectile",
+      origin,
+      activeItem.ownerEntityId(),
+      {1, 0},
+      false
+    )
+    if stance.teleport.pause and stance.teleport.pause.duration then -- hide and immobilize
+      status.addEphemeralEffect("project42neoinvisibility", stance.teleport.pause.duration)
+      for _, effect in ipairs(stance.teleport.pause.effects or {nil}) do
+        status.addEphemeralEffect(effect)
+      end
+      util.wait(stance.teleport.pause, function()
+        mcontroller.controlApproachVelocity({0, 0}, 65536)
+      end)
+    end
+    mcontroller.setPosition(dest)
+    mcontroller.setVelocity(endVelocity)
+  else
+    print("Failed teleport!")
+  end
+  
 end

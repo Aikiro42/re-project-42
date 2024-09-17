@@ -1,0 +1,13 @@
+{
+  "projectileName" : "project42neolaggingcamera",
+  "image" : "project42neolaggingcamera.png",
+  // "scripts": ["project42neolaggingcamera.lua"],
+  "frameNumber" : 1,
+  "power": 0,
+  "speed" : 0,
+  "damagePoly" : [[0, 0]],
+  "animationLoops" : false,
+  "flippable" : true,
+  "damageKind" : "NoDamage",
+  "timeToLive": 1
+}

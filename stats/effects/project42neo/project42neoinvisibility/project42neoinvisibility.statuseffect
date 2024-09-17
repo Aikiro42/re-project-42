@@ -1,0 +1,11 @@
+{
+  "name" : "project42neoinvisibility",
+  "effectConfig" : {
+    "alpha" : 0
+  },
+  "defaultDuration" : 1,
+
+  "scripts" : [
+    "project42neoinvisibility.lua"
+  ]
+}

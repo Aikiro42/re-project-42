@@ -164,6 +164,15 @@ function Weapon:updateAim()
   end
 end
 
+function Weapon:setCameraFocusEntity(entityID, override)
+  if override
+  or not self.cameraFocusEntity
+  or not world.entityExists(self.cameraFocusEntity) then
+    self.cameraFocusEntity = entityID
+    activeItem.setCameraFocusEntity(self.cameraFocusEntity)
+  end
+end
+
 function Weapon:screenShake(intensity)
   intensity = (intensity or 0.3)/2
 
@@ -177,8 +186,8 @@ function Weapon:screenShake(intensity)
     {1, 0},
     true
   )
-  activeItem.setCameraFocusEntity(cam)
 
+  self:setCameraFocusEntity(cam)
 
 end
 
