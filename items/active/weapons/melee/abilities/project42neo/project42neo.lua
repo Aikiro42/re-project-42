@@ -676,13 +676,10 @@ function Project42Neo:teleport(stance)
 
   --[[
   "teleport": {
-    "pause": {
-      "duration": 0,
-      "effects": []
-    }, // turn wielder invisible and wait for this duration
     "delta": [0, 0],
       // if number, rotate {delta, 0} by aimAngle, cap to aimPosition;
       // if vector, use it as offset
+    "lineOfSight": true,
     "correctionThreshold": 5,
     "endVelocity": 0 // if nil, maintain velocity; if number, multiply maintained velocity; if vector, set velocity
   }
@@ -700,36 +697,18 @@ function Project42Neo:teleport(stance)
     endVelocity = vec2.mul(mcontroller.velocity(), endVelocity)
   end
 
-  local origin = mcontroller.position()
-  local dest = vec2.add(origin, offset)
-  dest = util.correctCollision(mcontroller.collisionPoly(), origin, dest, stance.teleport.correctionThreshold)
-
-  local projectile
-  if stance.teleport.projectile then
-    projectile = {
-      projectiles = {
-        stance.teleport.projectile
-      }
-    }
+  if stance.teleport.lineOfSight == nil then
+    stance.teleport.lineOfSight = true
   end
 
+  local origin = mcontroller.position()
+  local dest = vec2.add(origin, offset)
+  if stance.teleport.lineOfSight then
+    dest = world.lineCollision(origin, dest, {"Block", "Dynamic"}) or dest
+  end
+  dest = util.correctCollision(mcontroller.collisionPoly(), origin, dest, stance.teleport.correctionThreshold)
+
   if dest then
-    world.spawnProjectile(
-      "project42neoscreenshakeprojectile",
-      origin,
-      activeItem.ownerEntityId(),
-      {1, 0},
-      false
-    )
-    if stance.teleport.pause and stance.teleport.pause.duration then -- hide and immobilize
-      status.addEphemeralEffect("project42neoinvisibility", stance.teleport.pause.duration)
-      for _, effect in ipairs(stance.teleport.pause.effects or {nil}) do
-        status.addEphemeralEffect(effect)
-      end
-      util.wait(stance.teleport.pause, function()
-        mcontroller.controlApproachVelocity({0, 0}, 65536)
-      end)
-    end
     mcontroller.setPosition(dest)
     mcontroller.setVelocity(endVelocity)
   else
