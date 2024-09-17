@@ -275,24 +275,6 @@ function Project42Neo:cursorDirection(specifySide)
   
   aimAngle = math.abs(aimAngle)
 
-  world.debugLine(
-    mcontroller.position(),
-    vec2.add(
-      mcontroller.position(),
-      vec2.rotate({10, 0}, NE)
-    ),
-    "red"
-  )
-
-  world.debugLine(
-    mcontroller.position(),
-    vec2.add(
-      mcontroller.position(),
-      vec2.rotate({10, 0}, NW)
-    ),
-    "red"
-  )
-
   if NE <= aimAngle and aimAngle <= NW then
     return tentativeDirection
   end
