@@ -20,6 +20,6 @@
     }
   },
   "sounds" : {
-    "hit": []
+    "perfectdodge": ["/stats/effects/project42neo/project42neododge/perfectdodge.ogg"]
   }
 }

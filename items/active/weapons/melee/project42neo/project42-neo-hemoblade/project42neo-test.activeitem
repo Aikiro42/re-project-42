@@ -83,6 +83,7 @@
   },
   
   "primaryAbility": {
+    "debugEnabled": true,
     "stats": {
       "attackSpeed": 10,
       "baseDamage": 4.2,

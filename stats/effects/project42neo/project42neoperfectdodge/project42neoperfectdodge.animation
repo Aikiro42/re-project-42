@@ -42,6 +42,6 @@
     }
   },
   "sounds" : {
-    "activate": []
+    "activate": ["/stats/effects/project42neo/project42neoperfectdodge/perfectdodge.ogg"]
   }
 }

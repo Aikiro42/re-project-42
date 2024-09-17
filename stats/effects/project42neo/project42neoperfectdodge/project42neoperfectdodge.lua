@@ -1,5 +1,7 @@
 function init()
 
+  animator.playSound("activate")
+
   animator.burstParticleEmitter("dodgeShine")
   if mcontroller.facingDirection() == 1 then
     animator.burstParticleEmitter("dodgeRight")

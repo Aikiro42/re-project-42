@@ -12,7 +12,20 @@ local print = function(str)
 end
 
 function Project42Neo:__debug(dt, fireMode, shiftHeld)
+
+  if not self.debugEnabled then return end
+
   status.giveResource("health", 9999)
+  
+  local debugOrigin = mcontroller.position()
+  local debugDestination = activeItem.ownerAimPosition()
+  debugDestination = world.lineCollision(debugOrigin, debugDestination, {"Block", "Dynamic"}) or debugDestination
+  world.debugLine(debugOrigin, debugDestination, "#AAAAAA")
+  local correctedDest = util.correctCollision(mcontroller.collisionPoly(), debugOrigin, debugDestination, nil, true)
+  if correctedDest then
+    world.debugLine(debugOrigin, correctedDest, "cyan")
+  end
+  
 end
 
 function Project42Neo:init()
@@ -633,8 +646,6 @@ end
 function Project42Neo:teleport(stance)
   if not stance then return end
   if not stance.teleport then return end
-
-  
 
 end
 
