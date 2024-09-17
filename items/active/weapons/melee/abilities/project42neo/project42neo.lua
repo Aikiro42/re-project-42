@@ -252,23 +252,46 @@ function Project42Neo:cursorDirection(specifySide)
   local quarterThreshold = 1.0471975512 -- pi / 3
   --]]
   
-  local pi13 = 1.0471975512 -- pi / 3
-  local pi23 = 2.09439510239 -- 2 * pi / 3
+  local NE = 0.7853981633974483 -- pi / 4
+  local NW = 2.356194490192345 -- 3 * pi / 4
+  
   local tentativeDirection = "up"
   if aimAngle <= 0 then
     tentativeDirection = "down"
   end
+  
   aimAngle = math.abs(aimAngle)
-  if pi13 <= aimAngle and aimAngle <= pi23 then
+
+  world.debugLine(
+    mcontroller.position(),
+    vec2.add(
+      mcontroller.position(),
+      vec2.rotate({10, 0}, NE)
+    ),
+    "red"
+  )
+
+  world.debugLine(
+    mcontroller.position(),
+    vec2.add(
+      mcontroller.position(),
+      vec2.rotate({10, 0}, NW)
+    ),
+    "red"
+  )
+
+  if NE <= aimAngle and aimAngle <= NW then
     return tentativeDirection
   end
+  
   if specifySide then
-    if aimAngle > pi23 then
+    if aimAngle > NW then
       return "left"
     else
       return "right"
     end
   end
+
   return "side"
 end
 
@@ -412,6 +435,8 @@ end
 
 function Project42Neo:dodging()
   if self.dodgeCounter <= 0 then return end
+
+  self.cancelled = true
   
   self.dodgeCounter = self.dodgeCounter - 1
   self.dodgeTimer = self.dodge.cooldown
@@ -602,6 +627,14 @@ function Project42Neo:projectile(stance)
     stance.projectile.track,
     stance.projectile.parameters
   )
+
+end
+
+function Project42Neo:teleport(stance)
+  if not stance then return end
+  if not stance.teleport then return end
+
+  
 
 end
 

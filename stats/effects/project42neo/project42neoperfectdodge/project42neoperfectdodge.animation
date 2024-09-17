@@ -1,7 +1,21 @@
 {
   "particleEmitters" : {
+    "dodgeShine": {
+      "emissionRate": 40,
+      "particles": [
+        {"particle": "project42neododgeflash"},
+        {"particle": "project42neododgeshine"},
+        {"particle": "project42neododgeshine"},
+        {"particle": "project42neododgeshine"},
+        {"particle": "project42neododgeshine"},
+        {"particle": "project42neododgeshine"},
+        {"particle": "project42neododgeshine"},
+        {"particle": "project42neododgeshine"},
+        {"particle": "project42neododgeshine"}
+      ]
+    },
     "dodgeRight" : {
-      "emissionRate" : 2,
+      "emissionRate" : 40,
       "particles" : [
         {
           "particle" : "project42neoperfectdodge1",
@@ -14,7 +28,7 @@
       ]
     },
     "dodgeLeft" : {
-      "emissionRate" : 2,
+      "emissionRate" : 40,
       "particles" : [
         {
           "particle" : "project42neoperfectdodgeleft1",

@@ -24,6 +24,8 @@ function update(dt)
 
   __debug_stuff()
 
+  drawQuadrants()
+
   self.sheathVisible = animationConfig.animationParameter("sheathVisible", false)
   self.ownerVelocity = animationConfig.animationParameter("ownerVelocity", {0, 0})
   self.ownerCrouching = animationConfig.animationParameter("ownerCrouching", false)
@@ -77,4 +79,17 @@ function renderText(offset, text, color, size, fullbright)
     flippable = false,
     layer = "front"
   }, vec2.add(activeItemAnimation.ownerPosition(), offset))
+end
+
+function drawQuadrants()
+  local distance = 8
+  for i=0, 3 do
+    local rot = util.toRadians(45 + 90*i)
+    localAnimator.addDrawable({
+      image="/items/active/weapons/melee/abilities/project42neo/indicator.png",
+      rotation = rot,
+      position = vec2.add(activeItemAnimation.ownerPosition(), vec2.rotate({distance, 0}, rot)),
+      fullbright = true
+    }, "ForegroundEntity+1")
+  end
 end

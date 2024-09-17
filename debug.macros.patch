@@ -1,0 +1,9 @@
+[
+  {
+      "op": "add",
+      "path": "/project42neo-test",
+      "value": [
+          "/spawnitem project42neo-test"
+      ]
+  }
+]

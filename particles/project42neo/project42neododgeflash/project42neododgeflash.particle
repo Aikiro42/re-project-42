@@ -1,0 +1,23 @@
+
+/*
+Credits to Nebulox and Nitrosteel for the particle code
+*/
+{
+  "kind": "project42neododgeflash",
+  "definition": {
+    "type" : "animated",
+    "animation" : "/particles/project42neo/project42neododgeflash/project42neododgeflash.animation",
+    "position" : [0, 0],
+    "initialVelocity" : [0, 0],
+    "collidesForeground" : false,
+    "timeToLive" : 1.0,
+    "destructionTime" : 0.1,
+    "destructionAction" : "fade",
+    "fullbright" : true,
+    "size" : 0.8,
+    "layer" : "front",
+    "variance" : {
+      "size" : 0.05
+    }
+  }
+}

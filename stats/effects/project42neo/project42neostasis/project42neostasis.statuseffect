@@ -1,0 +1,15 @@
+{
+  "name" : "project42neostasis",
+  "effectConfig" : {},
+  "defaultDuration" : 1.5,
+
+  "scripts" : [
+    "project42neostasis.lua"
+  ],
+
+  "animationConfig" : "project42neostasis.animation",
+
+  "label" : "Stasis",
+  "icon" : "/interface/statuses/timefreeze.png"
+
+}
