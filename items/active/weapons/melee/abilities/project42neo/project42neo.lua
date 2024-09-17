@@ -11,7 +11,13 @@ local print = function(str)
   chat.addMessage(str)
 end
 
-function Project42Neo:__debug(dt, fireMode, shiftHeld)
+function Project42Neo:__debugInit()
+
+  if not self.debugEnabled then return end
+
+end
+
+function Project42Neo:__debugUpdate(dt, fireMode, shiftHeld)
 
   if not self.debugEnabled then return end
 
@@ -50,16 +56,6 @@ function Project42Neo:init()
     cooldown = 0.5,
     speed = 100
   }, self.dodge or {})
-  self.dodgeListener = damageListener("damageTaken", function(notifications)
-    for _, notification in ipairs(notifications) do
-      if notification.hitType == "Hit"
-      and notification.damageDealt == 0
-      and notification.healthLost == 0 then
-        print("PERFECT DODGE!")
-      end
-    end
-  end)
-
 
   self.dodgeTimer = self.dodge.cooldown
   self.dodgeCounter = 2
@@ -133,6 +129,8 @@ function Project42Neo:init()
   animator.setParticleEmitterActive("blade", false)
   self.weapon:setStance(self.idle.sheathed)
 
+  self:__debugInit()
+
 end
 
 function Project42Neo:update(dt, fireMode, shiftHeld)
@@ -145,7 +143,7 @@ function Project42Neo:update(dt, fireMode, shiftHeld)
   
   self.cooldownTimer = math.max(0, self.cooldownTimer - self.dt)
 
-  self:__debug(dt, fireMode, shiftHeld)
+  self:__debugUpdate(dt, fireMode, shiftHeld)
   self:updateShield()
   self:updateDamage()
   self:updateDodge()
@@ -445,7 +443,6 @@ function Project42Neo:dodging()
   animator.playSound("dodge")
   util.wait(self.dodge.duration, function(dt, timer)
     local progress = timer / self.dodge.duration
-    self.dodgeListener:update()
     mcontroller.setVelocity({
       interp.sin(progress, 0, direction * self.dodge.speed),
       0
@@ -510,6 +507,7 @@ function Project42Neo:setStanceSequence(stanceSequence, isHeavy, stats, cancelCa
     if stance.duration then
       stance.duration = math.max((stance.damage or stance.shield) and 0.05 or 0, stance.duration / math.max(0.001, stats.attackSpeed))
     end
+    self:teleport(stance)
     self.weapon:setStance(stance)
     self:damage(stance, isHeavy, stats)
     self:shield(stance)
@@ -628,7 +626,20 @@ end
 function Project42Neo:teleport(stance)
   if not stance then return end
   if not stance.teleport then return end
+  if not stance.teleport.delta then return end
 
+  --[[
+  "teleport": {
+    "delta": [0, 0], // if number, rotate {delta, 0} by aimAngle; if vector, use it as offset
+    "endVelocity": 0 // if nil, maintain velocity; if number, multiply maintained velocity; if vector, set velocity
+    "projectile": {...projectile}
+  }
+  --]]
+  
+  self:projectile(stance.teleport.projectile)
+  
+  local offset = stance.teleport.delta
+  
 end
 
 function Project42Neo:uninit()
