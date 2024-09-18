@@ -170,12 +170,13 @@ function Weapon:setCameraFocusEntity(entityID, override)
   or not world.entityExists(self.cameraFocusEntity) then
     self.cameraFocusEntity = entityID
     activeItem.setCameraFocusEntity(self.cameraFocusEntity)
+    return true
   end
+  return false
 end
 
 function Weapon:screenShake(intensity)
   intensity = (intensity or 0.3)/2
-
 
   local offset = vec2.rotate({intensity, 0}, sb.nrand(math.pi, math.pi))
 
@@ -187,7 +188,9 @@ function Weapon:screenShake(intensity)
     true
   )
 
-  self:setCameraFocusEntity(cam)
+  if not self:setCameraFocusEntity(cam) then
+    world.sendEntityMessage(self.cameraFocusEntity, "screenshake")
+  end
 
 end
 

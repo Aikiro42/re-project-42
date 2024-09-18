@@ -10,6 +10,8 @@ local oldUpdate = update or function(dt) end
 function init()
   oldInit()
 
+  self.leftAngle = animationConfig.animationParameter("leftAngle", math.pi/4)
+  self.rightAngle = animationConfig.animationParameter("rightAngle", 3*math.pi/4)
   self.sheathProperties = animationConfig.animationParameter("sheathProperties")
   self.sheathJiggleProgress = 0
 
@@ -24,7 +26,7 @@ function update(dt)
 
   __debug_stuff()
 
-  drawQuadrants()
+  drawDirectionIndicator()
 
   self.sheathVisible = animationConfig.animationParameter("sheathVisible", false)
   self.ownerVelocity = animationConfig.animationParameter("ownerVelocity", {0, 0})
@@ -81,15 +83,11 @@ function renderText(offset, text, color, size, fullbright)
   }, vec2.add(activeItemAnimation.ownerPosition(), offset))
 end
 
-function drawQuadrants()
-  local distance = 8
-  for i=0, 3 do
-    local rot = util.toRadians(45 + 90*i)
-    localAnimator.addDrawable({
-      image="/items/active/weapons/melee/abilities/project42neo/indicator.png",
-      rotation = rot,
-      position = vec2.add(activeItemAnimation.ownerPosition(), vec2.rotate({distance, 0}, rot)),
-      fullbright = true
-    }, "ForegroundEntity+1")
-  end
+function drawDirectionIndicator()
+  local direction = animationConfig.animationParameter("cursorDirection", "up")
+  localAnimator.addDrawable({
+    image="/items/active/weapons/melee/abilities/project42neo/indicator.png:" .. direction,
+    position = activeItemAnimation.ownerPosition(),
+    fullbright = true
+  }, "Player-1")
 end

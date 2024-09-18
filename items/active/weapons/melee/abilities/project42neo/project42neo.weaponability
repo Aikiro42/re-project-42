@@ -229,6 +229,7 @@
     "cooldown": 0.1,
     "heavyAttackTime": 3,
     "comboGracePeriod": 1,
+    "directionAngleThreshold": 45,
     "offsetParameter": "baseOffset",
 
     "dodge": {
@@ -381,12 +382,13 @@
         "twoHanded": true,
         "aimAngle": 0
       },
-      "timeout": 1
+      "timeout": 3
     },
 
     "combo": {
       // "debugAttack": "plunge",
       "init": {
+        // first attacks into a combo
         "default": "verticalslash",
         "normal": {
           "up": "flipslash",
@@ -420,7 +422,6 @@
       },
 
       "attacks": {
-        ///*
         "upperverticalslash": {
           "sequence": [
             {
@@ -479,8 +480,8 @@
             "heavy": "diagonalslash"
           }
         },
-        //*/
         "verticalslash": {
+          /*
           "sequence": [
             {
               "armRotation": 90,
@@ -523,7 +524,8 @@
               "allowFlip": true
             }
           ],
-
+          */
+          "sequence": "verticalslash",
           "next": {
             "normal": {
               "default": "upperdiagonalslash"
@@ -959,21 +961,6 @@
               "teleport": {
                 "delta": 50
               }
-              /*
-                "projectiles": [
-                  {
-                    "type": "firespinswoosh"
-                  },
-                  {
-                    "type": "electricspinswoosh",
-                    "aimAngle": 15
-                  },
-                  {
-                    "type": "icespinswoosh",
-                    "aimAngle": -15
-                  }
-                ]
-                //*/
             }
           ],
           "next": {

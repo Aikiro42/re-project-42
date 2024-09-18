@@ -85,7 +85,7 @@
   "primaryAbility": {
     "debugEnabled": true,
     "stats": {
-      "attackSpeed": 10,
+      "attackSpeed": 1,
       "baseDamage": 4.2,
       "critChance": 0.32,
       "critDamage": 2.2

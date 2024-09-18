@@ -4,6 +4,7 @@ require "/scripts/versioningutils.lua"
 require "/items/buildscripts/abilities.lua"
 
 function build(directory, config, parameters, level, seed)
+
   local configParameter = function(keyName, defaultValue)
     if parameters[keyName] ~= nil then
       return parameters[keyName]
@@ -13,6 +14,44 @@ function build(directory, config, parameters, level, seed)
       return defaultValue
     end
   end
+  
+  construct(config, "primaryAbility")
+  local sequenceDirectoryPath = config.primaryAbility.stanceSequenceDirectory or "/items/buildscripts/project42neo/stanceSequences.config"
+  local sequenceDirectory = root.assetJson(sequenceDirectoryPath)
+  local applyStanceSequence = function (sequenceName)
+  
+    local sequencePath = sequenceDirectory[sequenceName]
+    local sequenceConfig = root.assetJson(sequencePath)
+
+    construct (config, "animationCustom", "animatedParts")
+    config.animationCustom.animatedParts = config.animationCustom.animatedParts or {}
+
+    construct(config.animationCustom.animatedParts, "stateTypes", "swoosh", "states")
+    config.animationCustom.animatedParts.stateTypes.swoosh.states[sequenceName] = sequenceConfig.state
+  
+    construct(config.animationCustom.animatedParts, "parts", "swoosh", "partStates", "swoosh", sequenceName)  
+    config.animationCustom.animatedParts.parts.swoosh.partStates.swoosh[sequenceName].properties = sequenceConfig.properties
+
+    local extras = {
+      "sounds",
+      "lights",
+      "particleEmitters"
+    }
+
+    for _, extra in ipairs(extras) do
+      if sequenceConfig[extra] then
+        construct(config.animationCustom, extra)
+        config.animationCustom[extra] = sb.jsonMerge(
+          config.animationCustom[extra],
+          sequenceConfig[extra]
+        )
+      end
+    end
+  
+    construct(config.primaryAbility, "combo", "attacks", sequenceName)
+    config.primaryAbility.combo.attacks[sequenceName].sequence = sequenceConfig.sequence
+      
+  end
 
   if level and not configParameter("fixedLevel", true) then
     parameters.level = level
@@ -21,33 +60,27 @@ function build(directory, config, parameters, level, seed)
   setupAbility(config, parameters, "primary")
   setupAbility(config, parameters, "alt")
 
-  -- elemental type and config (for alt ability)
+  -- SECTION: configure primary ability, expected to be project42neo
+  construct(config, "primaryAbility", "combo", "attacks")
+  for attackKey, attackConfig in pairs(config.primaryAbility.combo.attacks or {}) do
+    if type(attackConfig.sequence) == "string" then
+      applyStanceSequence(attackConfig.sequence)
+    end
+  end
+
   local elementalType = configParameter("elementalType", "physical")
+  -- TODO: elemental type and config (for shift abilities)
+  --[[
   replacePatternInData(config, nil, "<elementalType>", elementalType)
   if config.altAbility and config.altAbility.elementalConfig then
     util.mergeTable(config.altAbility, config.altAbility.elementalConfig[elementalType])
   end
+  --]]
 
   -- calculate damage level multiplier
   config.damageLevelMultiplier = root.evalFunction("weaponDamageLevelMultiplier", configParameter("level", 1))
 
-  -- palette swaps
-  config.paletteSwaps = ""
-  if config.palette then
-    local palette = root.assetJson(util.absolutePath(directory, config.palette))
-    local selectedSwaps = palette.swaps[configParameter("colorIndex", 1)]
-    for k, v in pairs(selectedSwaps) do
-      config.paletteSwaps = string.format("%s?replace=%s=%s", config.paletteSwaps, k, v)
-    end
-  end
-  if type(config.inventoryIcon) == "string" then
-    config.inventoryIcon = config.inventoryIcon .. config.paletteSwaps
-  else
-    for i, drawable in ipairs(config.inventoryIcon) do
-      if drawable.image then drawable.image = drawable.image .. config.paletteSwaps end
-    end
-  end
-
+  -- offsets
   if config.baseOffset then
 
     local swordParts = {

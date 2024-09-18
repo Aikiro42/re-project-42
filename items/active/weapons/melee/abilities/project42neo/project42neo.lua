@@ -1,4 +1,5 @@
 require "/scripts/project42neo/util.lua"
+require "/scripts/project42neo/vfx.lua"
 require "/scripts/poly.lua"
 require "/scripts/vec2.lua"
 require "/scripts/status.lua"
@@ -55,6 +56,10 @@ function Project42Neo:init()
   self.idleTimer = -1
   self.__maintainAirTimer = 0
   self.heavyAttackTime = 0.3
+  self.__rightAngle = util.toRadians(self.directionAngleThreshold)
+  self.__leftAngle = math.pi - self.__rightAngle
+  activeItem.setScriptedAnimationParameter("leftAngle", self.__leftAngle)
+  activeItem.setScriptedAnimationParameter("rightAngle", self.__rightAngle)
 
   self.dodge = sb.jsonMerge({
     duration = 0.1,
@@ -142,13 +147,13 @@ function Project42Neo:update(dt, fireMode, shiftHeld)
 
   WeaponAbility.update(self, dt, fireMode, shiftHeld)
 
-  activeItem.setCursor("/cursors/project42neo/meleecursor/meleecursor-" .. self:cursorDirection() .. ".cursor")
   status.addEphemeralEffect("nofalldamage", 1)
   activeItem.setScriptedAnimationParameter("sheathAnimationState", animator.animationState("sheath"))
   
   self.cooldownTimer = math.max(0, self.cooldownTimer - self.dt)
 
   self:__debugUpdate(dt, fireMode, shiftHeld)
+  self:updateCursor()
   self:updateShield()
   self:updateDamage()
   self:updateDodge()
@@ -200,6 +205,13 @@ end
 
 -- SECTION: [UPDATE] ____________________________________________________________________________________
 
+function Project42Neo:updateCursor()
+  local direction = self:cursorDirection(true)
+  local cursor = ({left=true, right=true})[direction] and "side" or direction
+  activeItem.setCursor("/cursors/project42neo/meleecursor/meleecursor-" .. cursor .. ".cursor")
+  activeItem.setScriptedAnimationParameter("cursorDirection", direction)
+end
+
 function Project42Neo:updateShield()
 
   self.currentShield.duration = self.currentShield.duration - self.dt
@@ -247,7 +259,7 @@ function Project42Neo:updateDodge()
 end
 
 function Project42Neo:maintainAir(stopTime, maxControlForce, controlVelocity)
-  stopTime = math.max(0.05, stopTime or 5)
+  stopTime = math.max(0.05, stopTime or 1)
   maxControlForce = maxControlForce or 500
   controlVelocity = controlVelocity or {0, 0}
   
@@ -287,30 +299,18 @@ function Project42Neo:cursorDirection(specifySide)
   end
   local quarterThreshold = 1.0471975512 -- pi / 3
   --]]
-  
-  local NE = 0.7853981633974483 -- pi / 4
-  local NW = 2.356194490192345 -- 3 * pi / 4
-  
-  local tentativeDirection = "up"
-  if aimAngle <= 0 then
-    tentativeDirection = "down"
-  end
-  
+    
+  local verticalDirection = aimAngle <= 0 and "down" or "up"
   aimAngle = math.abs(aimAngle)
 
-  if NE <= aimAngle and aimAngle <= NW then
-    return tentativeDirection
-  end
-  
-  if specifySide then
-    if aimAngle > NW then
-      return "left"
-    else
-      return "right"
-    end
+  if aimAngle < self.__rightAngle then
+    return specifySide and "right" or "side"
+  elseif self.__leftAngle < aimAngle then
+    return specifySide and "left" or "side"
+  else
+    return verticalDirection
   end
 
-  return "side"
 end
 
 -- SECTION: [STATES] ____________________________________________________________________________________
@@ -428,6 +428,7 @@ function Project42Neo:charging(attackKey)
       if not heavyReady then
         animator.burstParticleEmitter("charge")
         animator.playSound("heavyReady")
+        self.weapon:setStance(self.idle.ready)
         heavyReady = true
         self.weapon:screenShake(0.5)
       end
@@ -707,9 +708,10 @@ function Project42Neo:teleport(stance)
     dest = world.lineCollision(origin, dest, {"Block", "Dynamic"}) or dest
   end
   dest = util.correctCollision(mcontroller.collisionPoly(), origin, dest, stance.teleport.correctionThreshold)
-
+  
   if dest then
     mcontroller.setPosition(dest)
+    -- vfx.renderStreak(origin, dest, {255, 0, 0}, 25)
     mcontroller.setVelocity(endVelocity)
   else
     print("Failed teleport!")

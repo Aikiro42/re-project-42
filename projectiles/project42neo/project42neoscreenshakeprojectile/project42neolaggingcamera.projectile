@@ -1,7 +1,7 @@
 {
   "projectileName" : "project42neolaggingcamera",
-  "image" : "project42neolaggingcamera.png",
-  // "scripts": ["project42neolaggingcamera.lua"],
+  "image" : "invisibleprojectile.png",
+  "scripts": ["project42neolaggingcamera.lua"],
   "frameNumber" : 1,
   "power": 0,
   "speed" : 0,
