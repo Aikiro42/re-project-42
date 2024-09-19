@@ -577,11 +577,17 @@ function Project42Neo:damage(stance, isHeavy, stats)
   animator.resetTransformationGroup("swoosh")
   animator.rotateTransformationGroup("swoosh", rotation)
   animator.translateTransformationGroup("swoosh", offset)
+
+  local dmgArea = animator[damageParameters.lock and "partProperty" or "partPoly"]("swoosh", "damageArea")
+  if damageParameters.lock then
+    dmgArea = poly.rotate(dmgArea, -self.weapon.relativeArmRotation)
+    -- dmgArea = poly.translate(dmgArea, vec2.mul(activeItem.handPosition(), -1))
+  end
   
   self.currentDamage.duration = damageParameters.duration or stance.duration or 0.1
   self.currentDamage.args = {
     damageConfig = damageConfig,
-    damageArea = animator.partPoly("swoosh", "damageArea")
+    damageArea = dmgArea
   }
 
 end
