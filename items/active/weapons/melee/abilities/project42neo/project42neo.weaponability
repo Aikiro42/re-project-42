@@ -16,144 +16,6 @@
       "flipswing": ["/sfx/melee/flip_slash.ogg"],
       "sheath": ["/sfx/project42neo/default/sheath.ogg"]
     },
-    "animatedParts": {
-      "stateTypes": {
-        "swoosh": {
-          "states": {
-            "upperverticalslash": {
-              "frames": 3,
-              "cycle": 0.1,
-              "mode": "transition",
-              "transition": "idle"
-            },
-            "stab": {
-              "frames": 3,
-              "cycle": 0.1,
-              "mode": "transition",
-              "transition": "idle"
-            },
-            "diagonalslash": {
-              "frames": 3,
-              "cycle": 0.1,
-              "mode": "transition",
-              "transition": "idle"
-            },
-            "upperdiagonalslash": {
-              "frames": 3,
-              "cycle": 0.1,
-              "mode": "transition",
-              "transition": "idle"
-            },
-            "horizontalslash": {
-              "frames": 3,
-              "cycle": 0.1,
-              "mode": "transition",
-              "transition": "idle"
-            },
-            "risingslash": {
-              "frames": 3,
-              "cycle": 0.1,
-              "mode": "transition",
-              "transition": "idle"
-            }
-          }
-        }
-      },
-      "parts": {
-        "swoosh": {
-          "partStates": {
-            "swoosh": {
-              "upperverticalslash": {
-                "properties": {
-                  "image": "/items/active/weapons/melee/abilities/project42neo/swoosh/verticalslash.png:<frame>?flipy",
-                  "damageArea": [
-                    [-5, -2],
-                    [-2.5, -3],
-                    [1, -3],
-                    [4, -1.75],
-                    [5, 0.25],
-                    [5, 2.25],
-                    [4, 3.25],
-                    [0, 2.5]
-                  ]
-                }
-              },
-              "diagonalslash": {
-                "properties": {
-                  "image": "/items/active/weapons/melee/abilities/project42neo/swoosh/diagonalslash.png:<frame>",
-                  "damageArea": [
-                    [-2.0, 3.125],
-                    [0.375, 3.125],
-                    [4.25, 2.125],
-                    [6.75, 0.375],
-                    [6.75, -0.75],
-                    [6.75, -0.75],
-                    [5.875, -1.625],
-                    [2.625, -2.5],
-                    [-2.375, -2.75],
-                    [-6.75, -1.75]
-                  ]
-                }
-              },
-              "upperdiagonalslash": {
-                "properties": {
-                  "image": "/items/active/weapons/melee/abilities/project42neo/swoosh/diagonalslash.png:<frame>?flipy",
-                  "damageArea": [
-                    [-2.0, -3.125],
-                    [0.375, -3.125],
-                    [4.25, -2.125],
-                    [6.75, -0.375],
-                    [6.75, 0.75],
-                    [6.75, 0.75],
-                    [5.875, 1.625],
-                    [2.625, 2.5],
-                    [-2.375, 2.75],
-                    [-6.75, 1.75]
-                  ]  
-                }
-              },
-              "stab": {
-                "properties": {
-                  "image": "/items/active/weapons/melee/abilities/project42neo/swoosh/stab.png:<frame>",
-                  "damageArea": [
-                    [-4.75, 1.5],
-                    [3, 1],
-                    [3, -1],
-                    [-4.75, -1.5]
-                  ]  
-                }
-              },
-              "horizontalslash": {
-                "properties": {
-                  "image": "/items/active/weapons/melee/abilities/project42neo/swoosh/horizontalslash.png:<frame>",
-                  "damageArea": [
-                    [0.375, 0.9375],
-                    [1.875, 0.9375],
-                    [6.75, 0.0625],
-                    [3.5, -0.6875],
-                    [-6.0, -0.8125],
-                    [-6.875, -0.6875],
-                    [-0.25, -0.1875],
-                    [2.125, 0.1875]
-                  ]
-                }
-              },
-              "risingslash": {
-                "properties": {
-                  "image": "/items/active/weapons/melee/abilities/project42neo/swoosh/risingslash.png:<frame>",
-                  "damageArea": [
-                    [3.0, -2.875],
-                    [3.0, 3.0],
-                    [-0.625, 2.75],
-                    [-3.125, 0.75]
-                  ]  
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "lights": {
       "glow": {
         "active": false,
@@ -183,7 +45,7 @@
       "heavyEnergyCost": 20
     },
 
-    "energyCost": 10,
+    "energyCost": 1,
     "cooldown": 0.1,
     "heavyAttackTime": 3,
     "comboGracePeriod": 1,
@@ -192,7 +54,7 @@
 
     "dodge": {
       "duration": 0.15,
-      "cooldown": 0.5
+      "cooldown": 0.25
     },
 
     "globalDamageConfig": {
@@ -374,68 +236,17 @@
         "heavyAirborne": {
           "up": "flipslash",
           "down": "plunge",
-          "side": "teleportSlash",
+          "side": "teleportslash",
           "default": "diagonalheavy"
         }
       },
 
       "attacks": {
         "upperverticalslash": {
-          "sequence": [
-            {
-              "armRotation": -75,
-              "weaponRotation": -90,
-              "twoHanded": true,
-              "allowRotate": true,
-              "duration": 0.1
-            },
-            {
-              "armRotation": -75,
-              "weaponRotation": -90,
-              "twoHanded": true,
-              "allowRotate": false,
-              "weaponDirectives": "?flipy",
-              "duration": 0.1
-            },
-            {
-              "armRotation": 45,
-              "weaponRotation": -15,
-              "twoHanded": false,
-              "snap": true,
-              "duration": 0.1,
-              "weaponDirectives": "?flipy",
-
-              "animationStates": {
-                "swoosh": "upperverticalslash"
-              },
-              "playSounds": ["swing"],
-              "damage": {
-                "multiplier": 0.8,
-                "offset": [1, -1.75],
-                "rotation": -15
-              },
-              "shield": {
-                "area": [
-                  [0, -2],
-                  [0, 2],
-                  [6, 2.5],
-                  [6, -2.5]
-                ],
-                "offset": [0.25, -0.5],
-                "duration": 0.5
-              }
-            },
-            {
-              "armRotation": -45,
-              "weaponRotation": 45,
-              "twoHanded": true,
-              "allowFlip": true
-            }
-          ],
-
+          "sequence": "upperverticalslash",
           "next": {
             "default": "verticalslash",
-            "heavy": "diagonalslash"
+            "heavy": "diagonalheavy"
           }
         },
         "verticalslash": {
@@ -461,54 +272,7 @@
           }
         },
         "upperdiagonalslash": {
-          "sequence": [
-            {
-              "allowRotate": true,
-              "allowFlip": true,
-              "twoHanded": false,
-              "weaponRotation": -75,
-              "armRotation": -90,
-              "duration": 0.1
-            },
-            {
-              "allowRotate": true,
-              "allowFlip": true,
-              "twoHanded": false,
-              "weaponRotation": -75,
-              "armRotation": -90,
-              "weaponDirectives": "?flipy",
-              "duration": 0.1
-            },
-            {
-              "allowRotate": false,
-              "allowFlip": false,
-              "twoHanded": false,
-              "snap": true,
-              "armRotation": 90,
-              "weaponRotation": 90,
-              "duration": 0.1,
-
-              "animationStates": {
-                "swoosh": "upperdiagonalslash"
-              },
-              "playSounds": ["swing"],
-              "damage": {
-                "multiplier": 1,
-                "offset": [1.5, -2.125],
-                "rotation": -90
-              },
-              "shield": {
-                "area": [
-                  [0, -2],
-                  [0, 2],
-                  [6, 2.5],
-                  [6, -2.5]
-                ],
-                "offset": [0.25, -0.5],
-                "duration": 0.5
-              }
-            }
-          ],
+          "sequence": "upperdiagonalslash",
           "next": {
             "normal": {
               "default": "horizontalslash"
@@ -522,46 +286,7 @@
           }
         },
         "horizontalslash": {
-          "sequence": [
-            {
-              "allowRotate": true,
-              "allowFlip": true,
-              "twoHanded": false,
-              "weaponRotation": 85,
-              "armRotation": 75,
-              "duration": 0.2
-            },
-            {
-              "allowRotate": false,
-              "allowFlip": false,
-              "twoHanded": true,
-              "snap": true,
-              "weaponRotation": 0,
-              "armRotation": -165,
-              "weaponDirectives": "?flipy",
-              "duration": 0.1,
-
-              "animationStates": {
-                "swoosh": "horizontalslash"
-              },
-              "playSounds": ["swing"],
-              "damage": {
-                "multiplier": 1,
-                "offset": [2, 0],
-                "rotation": 165
-              },
-              "shield": {
-                "area": [
-                  [0, -2],
-                  [0, 2],
-                  [6, 2.5],
-                  [6, -2.5]
-                ],
-                "offset": [0.25, -0.5],
-                "duration": 0.5
-              }
-            }
-          ],
+          "sequence": "horizontalslash",
           "next": {
             "normal": {
               "default": "stab"
@@ -573,44 +298,7 @@
           }
         },
         "stab": {
-          "sequence": [
-            {
-              "weaponRotation": 0,
-              "armRotation": -165,
-              "weaponOffset": [-0.25, 0],
-              "twoHanded": true,
-              "allowRotate": true,
-              "allowFlip": true,
-              "weaponDirectives": "?flipy",
-              "duration": 0.2
-            },
-            {
-              "armRotation": 0,
-              "weaponRotation": 0,
-              "weaponOffset": [0, 0],
-              "twoHanded": true,
-              "snap": true,
-              "duration": 0.1,
-
-              "animationStates": {
-                "swoosh": "stab"
-              },
-              "playSounds": ["swing"],
-              "damage": {
-                "multiplier": 1.25,
-                "config": {
-                  "damageSourceKind": "spear"
-                },
-                "offset": [2, 0]
-              }
-            },
-            {
-              "armRotation": 0,
-              "weaponRotation": 0,
-              "allowRotate": false
-            }
-          ],
-
+          "sequence": "stab",
           "next": {
             "normal": {
               "default": "risingslash"
@@ -618,51 +306,7 @@
           }
         },
         "plunge": {
-          "sequence": [
-            {
-              "weaponRotation": -135,
-              "armRotation": 90,
-              "weaponOffset": [-0.5, 0],
-              "momentum": [0, 20],
-              "twoHanded": true,
-              "allowRotate": false,
-              "aimAngle": 0,
-              "allowFlip": true,
-              "weaponDirectives": "?flipy",
-              "duration": 0.2
-            },
-            {
-              "armRotation": 0,
-              "weaponRotation": -90,
-              "weaponOffset": [0, 0],
-              "twoHanded": true,
-              "snap": true,
-              "duration": 0.3,
-              "aimAngle": 0,
-              "momentum": [0, -100],
-              "weaponDirectives": "?flipy",
-
-              "animationStates": {
-                "swoosh": "stab"
-              },
-              "playSounds": ["swing"],
-              "damage": {
-                "multiplier": 1.25,
-                "config": {
-                  "damageSourceKind": "spear"
-                },
-                "offset": [5, 0],
-                "rotation": -90
-              }
-            },
-            {
-              "armRotation": 0,
-              "weaponRotation": -90,
-              "twoHanded": true,
-              "allowRotate": false
-            }
-          ],
-
+          "sequence": "plunge",
           "next": {
             "normal": {
               "default": "verticalslash"
@@ -670,46 +314,7 @@
           }
         },
         "risingslash": {
-          "sequence": [
-            {
-              "weaponRotation": 30,
-              "armRotation": -45,
-              "twoHanded": true,
-              "allowRotate": true,
-              "allowFlip": true,
-              "duration": 0.2
-            },
-            {
-              "weaponRotation": -60,
-              "armRotation": 75,
-              "weaponOffset": [0, 0],
-              "twoHanded": true,
-              "allowFlip": true,
-              "snap": true,
-              "duration": 0.1,
-              "weaponDirectives": "?flipy",
-
-              "animationStates": {
-                "swoosh": "risingslash"
-              },
-              "playSounds": ["swing"],
-              "damage": {
-                "multiplier": 0.5,
-                "offset": [2, -1.25],
-                "rotation": -75
-              },
-              "shield": {
-                "area": [
-                  [0, -2],
-                  [0, 2],
-                  [6, 2.5],
-                  [6, -2.5]
-                ],
-                "offset": [0.25, -0.5],
-                "duration": 0.1
-              }
-            }
-          ],
+          "sequence": "risingslash",
           "next": {
             "normal": {
               "default": "verticalslash"
@@ -721,119 +326,15 @@
           }
         },
         "diagonalheavy": {
-          "sequence": [
-            {
-              "allowRotate": true,
-              "allowFlip": true,
-              "twoHanded": true,
-              "weaponRotation": 90,
-              "armRotation": 90,
-              "duration": 0.2
-            },
-            {
-              "allowRotate": false,
-              "allowFlip": false,
-              "twoHanded": true,
-              "snap": true,
-              "weaponRotation": -30,
-              "armRotation": -135,
-              "duration": 0.1,
-              "aimMomentum": true,
-              "momentum": [50, 0],
-
-              "animationStates": {
-                "swoosh": "diagonalslash"
-              },
-              "playSounds": ["swing"],
-              "damage": {
-                "multiplier": 1.5,
-                "config": {
-                  "knockback": 40
-                },
-                "offset": [1, 0],
-                "rotation": 135
-              },
-              "shield": {
-                "area": [
-                  [0, -2],
-                  [0, 2],
-                  [6, 2.5],
-                  [6, -2.5]
-                ],
-                "offset": [0.25, -0.5],
-                "duration": 0.5
-              }
-              /*
-                "projectiles": [
-                  {
-                    "type": "firespinswoosh"
-                  },
-                  {
-                    "type": "electricspinswoosh",
-                    "aimAngle": 15
-                  },
-                  {
-                    "type": "icespinswoosh",
-                    "aimAngle": -15
-                  }
-                ]
-                //*/
-            }
-          ],
+          "sequence": "diagonalslash",
           "next": {
             "normal": {
               "default": "upperdiagonalslash"
             }
           }
         },
-        "teleportSlash": {
-          "sequence": [
-            {
-              "allowRotate": true,
-              "allowFlip": true,
-              "twoHanded": true,
-              "weaponRotation": 90,
-              "armRotation": 90,
-              "duration": 0.2
-            },
-            {
-              "allowRotate": false,
-              "allowFlip": false,
-              "twoHanded": true,
-              "snap": true,
-              "weaponRotation": -30,
-              "armRotation": -135,
-              "duration": 0.1,
-              "aimMomentum": true,
-              "momentum": [50, 0],
-
-              "animationStates": {
-                "swoosh": "diagonalslash"
-              },
-              "playSounds": ["swing"],
-              "damage": {
-                "multiplier": 1.5,
-                "config": {
-                  "knockback": 40
-                },
-                "offset": [1, 0],
-                "rotation": 135
-              },
-              "shield": {
-                "area": [
-                  [0, -2],
-                  [0, 2],
-                  [6, 2.5],
-                  [6, -2.5]
-                ],
-                "offset": [0.25, -0.5],
-                "duration": 0.5
-              },
-              "teleport": {
-                "delta": 50
-              }
-            }
-          ],
+        "teleportslash": {
+          "sequence": "teleportslash",
           "next": {
             "normal": {
               "default": "upperdiagonalslash"

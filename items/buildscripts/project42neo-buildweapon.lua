@@ -18,7 +18,7 @@ function build(directory, config, parameters, level, seed)
   construct(config, "primaryAbility")
   local sequenceDirectoryPath = config.primaryAbility.stanceSequenceDirectory or "/items/buildscripts/project42neo/stanceSequences.config"
   local sequenceDirectory = root.assetJson(sequenceDirectoryPath)
-  local applyStanceSequence = function (sequenceName)
+  local applyStanceSequence = function (sequenceName, attackKey)
   
     local sequencePath = sequenceDirectory[sequenceName]
     local sequenceConfig = root.assetJson(sequencePath)
@@ -49,7 +49,8 @@ function build(directory, config, parameters, level, seed)
     end
   
     construct(config.primaryAbility, "combo", "attacks", sequenceName)
-    config.primaryAbility.combo.attacks[sequenceName].sequence = sequenceConfig.sequence
+    config.primaryAbility.combo.attacks[attackKey or sequenceName].sequence = sequenceConfig.sequence
+    config.primaryAbility.combo.attacks[attackKey or sequenceName].attackIndex = sequenceConfig.attackIndex
       
   end
 
@@ -64,7 +65,8 @@ function build(directory, config, parameters, level, seed)
   construct(config, "primaryAbility", "combo", "attacks")
   for attackKey, attackConfig in pairs(config.primaryAbility.combo.attacks or {}) do
     if type(attackConfig.sequence) == "string" then
-      applyStanceSequence(attackConfig.sequence)
+      sb.logInfo(attackKey .. attackConfig.sequence)
+      applyStanceSequence(attackConfig.sequence, attackKey)
     end
   end
 

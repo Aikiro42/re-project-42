@@ -23,18 +23,7 @@ function Project42Neo:__debugUpdate(dt, fireMode, shiftHeld)
   if not self.debugEnabled then return end
 
   status.giveResource("health", 9999)
-  
-  --[[
-  local debugOrigin = mcontroller.position()
-  local debugDestination = activeItem.ownerAimPosition()
-  debugDestination = world.lineCollision(debugOrigin, debugDestination, {"Block", "Dynamic"}) or debugDestination
-  world.debugLine(debugOrigin, debugDestination, "#AAAAAA")
-  local correctedDest = util.correctCollision(mcontroller.collisionPoly(), debugOrigin, debugDestination, nil, true)
-  if correctedDest then
-    world.debugLine(debugOrigin, correctedDest, "cyan")
-  end
-  --]]
-  
+    
 end
 
 -- SECTION: [MAIN] ______________________________________________________________________________________
@@ -68,8 +57,7 @@ function Project42Neo:init()
   }, self.dodge or {})
 
   self.dodgeTimer = self.dodge.cooldown
-  self.dodgeCounter = 2
-
+  
   self.currentDamage = {
     duration = 0
   }
@@ -79,8 +67,13 @@ function Project42Neo:init()
       for _, notification in ipairs(notifications) do
         if notification.hitType == "ShieldHit" then
           animator.playSound("parry")
-          self.currentShield.duration = 0.1
-          -- self.currentShield.args = nil
+          if self.attackKey then
+            local nextStep = self:getNextStep(self.attackKey)
+            if self.combo.attacks[nextStep].attackIndex then
+              self:setState(self.attacking, nextStep, self.combo.attacks[nextStep].attackIndex)
+            end
+          end
+          -- self.currentShield.duration = 1
           break
         end
       end
@@ -200,6 +193,7 @@ function Project42Neo:update(dt, fireMode, shiftHeld)
 end
 
 function Project42Neo:uninit()
+  mcontroller.setRotation(0)
   self.weapon:setDamage()
 end
 
@@ -220,7 +214,28 @@ function Project42Neo:updateShield()
   end
 
   if self.currentShield.args then
-    activeItem.setShieldPolys(self.currentShield.args.polys)
+    -- determine shield boundBox
+    --[[
+    local entityQueryArea = poly.boundBox(poly.translate(self.currentShield.args.shieldArea, mcontroller.position()))
+    entityQueryArea = {
+      {entityQueryArea[1], entityQueryArea[2]},
+      {entityQueryArea[3], entityQueryArea[4]}
+    }
+    
+    -- query entities within shield boundbox
+    local detected = world.entityQuery(entityQueryArea[1], entityQueryArea[2], {
+      withoutEntityId = activeItem.ownerEntityId(),
+      includedTypes = {"projectile"},
+      order = "nearest"
+    })
+    for _, eID in ipairs(detected) do
+      if ({projectile=true, npc=true})[world.entityType(eID)] then
+        animator.playSound("parry")
+        activeItem.setShieldPolys({self.currentShield.args.shieldArea})
+      end
+    end
+    --]]
+    activeItem.setShieldPolys({self.currentShield.args.shieldArea})
     self.currentShield.listener:update()
   else
     activeItem.setShieldPolys()
@@ -251,11 +266,7 @@ function Project42Neo:updateDamage()
 end
 
 function Project42Neo:updateDodge()
-  if self.dodgeTimer > 0 then
-    self.dodgeTimer = self.dodgeTimer - self.dt
-  else
-    self.dodgeCounter = 2
-  end
+  self.dodgeTimer = math.max(0, self.dodgeTimer - self.dt)
 end
 
 function Project42Neo:maintainAir(stopTime, maxControlForce, controlVelocity)
@@ -316,7 +327,7 @@ end
 -- SECTION: [STATES] ____________________________________________________________________________________
 
 function Project42Neo:unsheathing()
-  print("unsheathing")
+  -- print("unsheathing")
   self:setStanceSequence(self.idle.unsheathing, false, self.stats)
   self.weapon:setStance(self.idle.ready)
   animator.setParticleEmitterActive("blade", true)
@@ -324,7 +335,7 @@ function Project42Neo:unsheathing()
 end
 
 function Project42Neo:sheathing()
-  print("sheathing")
+  -- print("sheathing")
   self:setStanceSequence(self.idle.sheathing, false, self.stats)
   self.weapon:setStance(self.idle.sheathed)
   animator.setParticleEmitterActive("blade", false)
@@ -332,19 +343,21 @@ function Project42Neo:sheathing()
 end
 
 function Project42Neo:idling()
-  print("idling")
+  -- print("idling")
   self:setStanceSequence(self.idle.sequence, false, self.stats)
 end
 
-function Project42Neo:attacking(attackKey, isHeavy)
+function Project42Neo:attacking(attackKey, isHeavy, attackIndex)
 
   self.isAttacking = true
   self.idleTimer = self.idle.timeout
   -- attack
-  print("attack: " .. attackKey .. (isHeavy and "(heavy)" or ""))
+  -- print("attack: " .. attackKey .. (isHeavy and "(heavy)" or ""))
+  self.attackKey = attackKey
+
   self:setStanceSequence(self.combo.attacks[attackKey].sequence, isHeavy, self.stats, function()
     self:setState(self.dodging)
-  end)
+  end, attackIndex)
 
   -- if input is held down after attack, initiate heavy
   local triggered = self:triggering()
@@ -454,18 +467,16 @@ function Project42Neo:charging(attackKey)
 end
 
 function Project42Neo:resetting(attackKey)
+  self.attackKey = nil
   self:setStanceSequence(self.combo.attacks[attackKey].resetSequence)
   self.weapon:setStance(self.idle.ready)
   self.isAttacking = false
 end
 
 function Project42Neo:dodging()
-  if self.dodgeCounter <= 0 then return end
+  if self.dodgeTimer > 0 then return end
 
   self.cancelled = true
-  
-  self.dodgeCounter = self.dodgeCounter - 1
-  self.dodgeTimer = self.dodge.cooldown
   
   -- determine dodge direction
   local direction = mcontroller.xVelocity() < -0 and -1 or 1
@@ -483,6 +494,8 @@ function Project42Neo:dodging()
   end)
     
   self.weapon:setStance(self.idle.ready)
+
+  self.dodgeTimer = self.dodge.cooldown
 
 end
 
@@ -519,17 +532,18 @@ function Project42Neo:getNextStep(attackKey, isHeavy)
 
 end
 
-function Project42Neo:setStanceSequence(stanceSequence, isHeavy, stats, cancelCallback)
+function Project42Neo:setStanceSequence(stanceSequence, isHeavy, stats, cancelCallback, startingIndex)
   if not stanceSequence then return end
   if #stanceSequence == 0 then return end
 
-  local i = 1
+  local i = startingIndex or 1
   while i <= #stanceSequence do
     local stance = copy(stanceSequence[i])
     if stance.duration then
       stance.duration = math.max((stance.damage or stance.shield) and 0.05 or 0, stance.duration / math.max(0.001, stats.attackSpeed))
     end
     self:teleport(stance)
+    self:statuses(stance)
     self.weapon:setStance(stance)
     self:damage(stance, isHeavy, stats)
     self:shield(stance)
@@ -595,11 +609,22 @@ end
 function Project42Neo:shield(stance)
 
   if not stance then return end
-  if not stance.shield then
-    self.currentShield.args = nil
-    self.currentShield.duration = 0
-    return
-  end
+  if not stance.shield then return end
+
+  --[[
+  "shield": {
+    "shieldArea": [Poly],
+    "duration": float,
+    "offset": Vec2
+    "rotation": degrees,
+
+    "parryProjectile": {
+      "type": string,
+      "parameters": {projectileParams}
+    }
+    "parryStatuses": [statuses]
+  }
+  --]]
   
   local shieldParameters = stance.shield
   
@@ -608,16 +633,21 @@ function Project42Neo:shield(stance)
   )
   local offset = vec2.rotate(shieldParameters.offset or {0, 0}, rotation)
 
+  local shieldArea = animator.partPoly("swoosh", "shieldArea") or poly.translate(
+    poly.rotate(
+      shieldParameters.area or {},
+      stance.aimAngle or activeItem.aimAngle(0, activeItem.ownerAimPosition())
+    ),
+    offset
+  )
+
   self.currentShield.duration = shieldParameters.duration or stance.duration or 0
   self.currentShield.args = {
-    polys = {poly.translate(
-      poly.rotate(
-        shieldParameters.area or {},
-        stance.aimAngle or activeItem.aimAngle(0, activeItem.ownerAimPosition())
-      ),
-      offset
-    )}
+    shieldArea = shieldArea,
   }
+  self.currentShield.parryProjectile = sb.jsonMerge({
+    type = "standardbullet"
+  }, stance.shield.parryProjectile or {})
 
 end
 
@@ -723,4 +753,18 @@ function Project42Neo:teleport(stance)
     print("Failed teleport!")
   end
   
+end
+
+function Project42Neo:statuses(stance)
+  if not stance then return end
+  if not stance.statusEffects then return end
+  if #stance.statusEffects == 0 then
+    stance.statusEffects = {nil}
+  end
+  for _, effect in ipairs(stance.statusEffects) do
+    status.addEphemeralEffect(effect)
+  end
+end
+
+function Project42Neo:parry()
 end
