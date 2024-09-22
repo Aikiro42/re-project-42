@@ -1,0 +1,109 @@
+{
+  "itemName" : "project42-neo-hologlaive",
+  "price" : 4200,
+  "level" : 1,
+  "maxStack" : 1,
+  "rarity" : "Common",
+  "description" : "Stuff.",
+  "shortdescription" : "Hologlaive",
+  "tooltipKind" : "sword",
+  "category" : "spear",
+  "twoHanded" : true,
+  "itemTags" : ["weapon","melee","spear"],
+
+  "inventoryIcon" : "project42-neo-hologlaive.png",
+  
+  "animationParts" : {
+    "blade" : "project42-neo-hologlaive.png",
+    "bladeFullbright" : "",
+    "charge": ""
+  },
+
+  "animationCustom": {
+
+    "sounds": {
+      "ready": ["/sfx/gun/magnorbs_shield_loop2.ogg"]
+    },
+
+    "animatedParts": {
+      "parts": {
+        "swoosh": {
+          "properties": {
+            "fullbright": true
+          },
+          "partStates": {
+            "swoosh" : {}
+          }
+        }
+      }
+    }
+  },
+
+  "scripts" : ["/items/active/weapons/melee/project42neo-meleeweapon.lua"],
+
+  "elementalType" : "poison",
+
+  "baseOffset": [0, 0],
+  "primaryAbilityType" : "project42neo",
+    
+
+  "sheath": {
+    "image": {
+      "sheathed": "/items/active/weapons/melee/project42neo/project54-neo-hologlaive/project42-neo-hologlaive.png"
+    },
+    "offset": [-0.5, 0],
+    "rotation": 45,
+    "layer": -2
+  },
+
+  "primaryAbility": {
+    "debugEnabled": true,
+    "stats": {
+      "attackSpeed": 1,
+      "baseDamage": 4.2,
+      "critChance": 0.2,
+      "critDamage": 2.2
+    },
+
+    "idle": {
+      "unsheathing": "diagonalslash"
+    },
+
+    "combo": {
+      "init": {
+        // first attacks into a combo
+        "default": "diagonalslash",
+        "normal": {
+          "up": "flipslash",
+          "default": "diagonalslash"
+        },
+        "normalAirborne": {
+          "default": "diagonalslash",
+          "down": "plunge"
+        }
+      },
+      "attacks": {
+        "diagonalslash": {
+          "sequence": "diagonalslash",
+          "next": {
+            "default": "verticalslash"
+          }
+        },
+        "verticalslash": {
+          "sequence": "verticalslash",
+          "next": {
+            "default": "horizontalslash"
+          }
+        },
+        "horizontalslash": {
+          "sequence": "horizontalslash",
+          "next": {
+            "default": "diagonalslash"
+          }
+        }
+      }
+    }
+  },
+  
+  "builder" : "/items/buildscripts/project42neo-buildweapon.lua"
+}

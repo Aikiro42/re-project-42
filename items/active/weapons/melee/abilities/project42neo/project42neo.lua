@@ -171,6 +171,7 @@ function Project42Neo:update(dt, fireMode, shiftHeld)
   if self.cooldownTimer <= 0
   and not self.weapon.currentAbility
   then
+
     if self:triggering() then
 
       if animator.animationState("sheath") == "sheathed" then
@@ -178,6 +179,8 @@ function Project42Neo:update(dt, fireMode, shiftHeld)
       else
         self:setState(self.attacking, self:getFirstStep())
       end
+      self.idleTimer = self.idle.timeout
+
     elseif self:cancelling(true) then
 
       if animator.animationState("sheath") == "sheathed" then
@@ -185,8 +188,9 @@ function Project42Neo:update(dt, fireMode, shiftHeld)
       else
         self:setState(self.dodging)
       end
+      self.idleTimer = self.idle.timeout
+
     end
-    self.idleTimer = self.idle.timeout
 
   end
 
@@ -270,16 +274,6 @@ function Project42Neo:updateDodge()
 end
 
 function Project42Neo:maintainAir(stopTime, maxControlForce, controlVelocity)
-  stopTime = math.max(0.05, stopTime or 1)
-  maxControlForce = maxControlForce or 500
-  controlVelocity = controlVelocity or {0, 0}
-  
-  if mcontroller.onGround() then
-    self.__maintainAirTimer = 0
-  else
-    self.__maintainAirTimer = math.min(self.__maintainAirTimer + self.dt, stopTime)
-    mcontroller.controlApproachVelocity(controlVelocity, maxControlForce * self.__maintainAirTimer / stopTime)
-  end
 
 end
 
@@ -358,6 +352,12 @@ function Project42Neo:attacking(attackKey, isHeavy, attackIndex)
   self:setStanceSequence(self.combo.attacks[attackKey].sequence, isHeavy, self.stats, function()
     self:setState(self.dodging)
   end, attackIndex)
+
+  if (self.combo.attacks[attackKey].next or {}).auto then
+    local nextStep = self.combo.attacks[attackKey].next.auto
+    local nextAttackIndex = self.combo.attacks[nextStep].attackIndex
+    self:setState(self.attacking, nextStep, attackIndex and nextAttackIndex or nil)
+  end
 
   -- if input is held down after attack, initiate heavy
   local triggered = self:triggering()
@@ -538,17 +538,21 @@ function Project42Neo:setStanceSequence(stanceSequence, isHeavy, stats, cancelCa
 
   local i = startingIndex or 1
   while i <= #stanceSequence do
-    local stance = copy(stanceSequence[i])
-    if stance.duration then
-      stance.duration = math.max((stance.damage or stance.shield) and 0.05 or 0, stance.duration / math.max(0.001, stats.attackSpeed))
+    local stance = stanceSequence[i]
+    local duration = stance.duration
+    if duration then
+      duration = math.max(
+        (stance.damage or stance.shield) and 0.05 or 0,
+        duration / math.max(0.001, stats.attackSpeed)
+      )
     end
     self:teleport(stance)
     self:statuses(stance)
     self.weapon:setStance(stance)
-    self:damage(stance, isHeavy, stats)
-    self:shield(stance)
+    self:damage(stance, duration, isHeavy, stats)
+    self:shield(stance, duration)
     self:projectiles(stance)
-    util.wait(stance.duration or 0, function()
+    util.wait(duration or 0, function()
       if self:cancelling(true) and cancelCallback then
         print("CANCELED (in stance)")
         stanceSequence = {}
@@ -561,11 +565,13 @@ function Project42Neo:setStanceSequence(stanceSequence, isHeavy, stats, cancelCa
     i = i + 1
     coroutine.yield()
   end
+  
 end
 
-function Project42Neo:damage(stance, isHeavy, stats)
+function Project42Neo:damage(stance, stanceDuration, isHeavy, stats)
   if not stance then return end
   if not stance.damage then return end
+  stanceDuration = stanceDuration or stance.duration
 
   status.overConsumeResource("energy", isHeavy and stats.heavyEnergyCost or stance.damage.energyCost or 0)
   status.consumeResource("health", isHeavy and stats.heavyHealthCost or stance.damage.healthCost or 0)
@@ -598,7 +604,7 @@ function Project42Neo:damage(stance, isHeavy, stats)
     -- dmgArea = poly.translate(dmgArea, vec2.mul(activeItem.handPosition(), -1))
   end
   
-  self.currentDamage.duration = damageParameters.duration or stance.duration or 0.1
+  self.currentDamage.duration = damageParameters.duration or stanceDuration or 0.1
   self.currentDamage.args = {
     damageConfig = damageConfig,
     damageArea = dmgArea
@@ -606,10 +612,11 @@ function Project42Neo:damage(stance, isHeavy, stats)
 
 end
 
-function Project42Neo:shield(stance)
+function Project42Neo:shield(stance, stanceDuration)
 
   if not stance then return end
   if not stance.shield then return end
+  stanceDuration = stanceDuration or stance.duration
 
   --[[
   "shield": {
@@ -641,7 +648,7 @@ function Project42Neo:shield(stance)
     offset
   )
 
-  self.currentShield.duration = shieldParameters.duration or stance.duration or 0
+  self.currentShield.duration = shieldParameters.duration or stanceDuration or 0
   self.currentShield.args = {
     shieldArea = shieldArea,
   }

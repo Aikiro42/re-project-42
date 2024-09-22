@@ -13,8 +13,16 @@
 
     "ready": [],
 
-    "slash": ["/sfx/melee/swing_dagger.ogg"],
-    
+    "swing": [
+      "/sfx/project42neo/default/swing1.ogg",
+      "/sfx/project42neo/default/swing2.ogg",
+      "/sfx/project42neo/default/swing3.ogg",
+      "/sfx/project42neo/default/swing4.ogg",
+      "/sfx/project42neo/default/swing5.ogg",
+      "/sfx/project42neo/default/swing6.ogg",
+      "/sfx/project42neo/default/swing7.ogg"
+    ],
+
     "heavyLoop": ["/sfx/gun/mech_beamdrill_loop.ogg"],
     "heavyReady": [ "/sfx/melee/sword_parry.ogg" ],
     "heavy": ["/sfx/melee/astraltear1.ogg", "/sfx/melee/astraltear2.ogg"],
@@ -26,7 +34,10 @@
       "/sfx/melee/swing_axe_fire1.ogg",
       "/sfx/melee/swing_axe_fire2.ogg",
       "/sfx/melee/swing_axe_fire3.ogg"
-    ]
+    ],
+
+    "unsheath": [],
+    "sheath": []
     
   },
 

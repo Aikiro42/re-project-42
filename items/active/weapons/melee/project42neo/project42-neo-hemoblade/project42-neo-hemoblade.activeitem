@@ -44,46 +44,13 @@
           },
           "partStates": {
             "swoosh" : {
+              /*
               "verticalslash" : {
                 "properties" : {
                   "image" : "/items/active/weapons/melee/project42neo/project42-neo-hemoblade/swoosh/verticalslash.png:<frame>"
                 }
               },
-              "upperverticalslash" : {
-                "properties" : {
-                  "image" : "/items/active/weapons/melee/project42neo/project42-neo-hemoblade/swoosh/verticalslash.png:<frame>?flipy"
-                }
-              },
-              "flipslash" : {
-                "properties" : {
-                  "image" : "/items/active/weapons/melee/project42neo/project42-neo-hemoblade/swoosh/verticalslash.png:<frame>?flipy"
-                }
-              },
-              "diagonalslash" : {
-                "properties" : {
-                  "image" : "/items/active/weapons/melee/project42neo/project42-neo-hemoblade/swoosh/diagonalslash.png:<frame>"
-                }
-              },
-              "upperdiagonalslash" : {
-                "properties" : {
-                  "image" : "/items/active/weapons/melee/project42neo/project42-neo-hemoblade/swoosh/diagonalslash.png:<frame>?flipy"
-                }
-              },
-              "stab" : {
-                "properties" : {
-                  "image" : "/items/active/weapons/melee/project42neo/project42-neo-hemoblade/swoosh/stab.png:<frame>"
-                }
-              },
-              "horizontalslash": {
-                "properties" : {
-                  "image" : "/items/active/weapons/melee/project42neo/project42-neo-hemoblade/swoosh/horizontalslash.png:<frame>"
-                }
-              },
-              "risingslash": {
-                "properties" : {
-                  "image" : "/items/active/weapons/melee/project42neo/project42-neo-hemoblade/swoosh/risingslash.png:<frame>"
-                }
-              }
+              */
             }
           }
         }

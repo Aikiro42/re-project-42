@@ -3,7 +3,6 @@
   "animationScripts": ["/items/active/weapons/melee/abilities/project42neo/project42neoanimation.lua"],
   "animationCustom": {
     "sounds": {
-      "unsheath": ["/sfx/melee/charge_traildash1.ogg"],
       "swing": [
         "/sfx/project42neo/default/swing1.ogg",
         "/sfx/project42neo/default/swing2.ogg",
@@ -14,6 +13,8 @@
         "/sfx/project42neo/default/swing7.ogg"
       ],
       "flipswing": ["/sfx/melee/flip_slash.ogg"],
+      
+      "unsheath": ["/sfx/melee/charge_traildash1.ogg"],
       "sheath": ["/sfx/project42neo/default/sheath.ogg"]
     },
     "lights": {
@@ -77,84 +78,7 @@
         "sheathStatus": "sheathed",
         "weaponHidden": true
       },
-      "unsheathing": [
-        {
-          "armRotation": -75,
-          "weaponRotation": -90,
-          "twoHanded": true,
-          "allowRotate": false,
-          "aimAngle": 0,
-          "sheathVisible": false,
-          "weaponOffset": [-2, 0],
-          "duration": 0.05
-        },
-        {
-          "armRotation": -75,
-          "weaponRotation": -90,
-          "twoHanded": true,
-          "allowRotate": false,
-          "weaponOffset": [-2, 0],
-          "weaponDirectives": "?flipy",
-          "animationStates": {
-            "sheath": "unsheathing"
-          },
-          "lights": {
-            "glow": true
-          },
-          "duration": 0.05
-        },
-        {
-          "armRotation": -75,
-          "weaponRotation": -90,
-          "allowRotate": true,
-          "allowFlip": true
-        },
-        {
-          "armRotation": 45,
-          "weaponRotation": -15,
-          "twoHanded": false,
-          "snap": true,
-          "duration": 0.1,
-          "weaponDirectives": "?flipy",
-          "sheathVisible": true,
-          "sheathStatus": "unsheathed",
-
-          "animationStates": {
-            "swoosh": "upperverticalslash"
-          },
-          "playSounds": ["swing", "unsheath"],
-          "loopSounds": ["ready"],
-          "damage": {
-            "multiplier": 0.8,
-            "config": {
-              "damageSourceKind": "dagger",
-              "statusEffects": [],
-              "knockbackMode": "aim",
-              "knockback": 40,
-              "timeout": 0.1
-            },
-            "offset": [2, -1.75],
-            "rotation": -15
-          },
-
-          "shield": {
-            "area": [
-              [0, -2],
-              [0, 2],
-              [6, 2.5],
-              [6, -2.5]
-            ],
-            "offset": [0.25, -0.5],
-            "duration": 0.5
-          }
-        },
-        {
-          "armRotation": -45,
-          "weaponRotation": 45,
-          "twoHanded": true,
-          "allowFlip": true
-        }
-      ],
+      "unsheathing": "drawslash",
       "sheathing": [
         {
           "twoHanded": true,

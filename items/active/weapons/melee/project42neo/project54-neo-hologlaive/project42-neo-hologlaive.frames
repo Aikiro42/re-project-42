@@ -1,0 +1,26 @@
+{
+  "frameGrid" : {
+    "size" : [51, 8],
+    // "dimensions" : [11, 3],
+    "dimensions" : [1, 1],
+
+    /*
+    "names" : [
+      [ "sheathed.1", null, null, null, null, null, null, null, null, null, null],
+      [ "unsheathing.1", null, null, null, null, null, null, null, null, null, null],
+      [ "ready.1", "ready.2", "ready.3", "ready.4", "ready.5", "ready.6", "ready.7", "ready.8", "ready.9", "ready.10", "ready.11"]
+    ]
+    */
+    "names": [
+      ["default"]
+    ]
+  },
+
+  
+  "aliases" : {
+    "sheathed.1" : "default",
+    "unsheathing.1" : "default",
+    "ready.1" : "default",
+    "sheathing.1" : "default"
+  }
+}

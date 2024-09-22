@@ -1,7 +1,7 @@
 require "/scripts/util.lua"
 require "/scripts/vec2.lua"
 require "/scripts/versioningutils.lua"
-require "/items/buildscripts/abilities.lua"
+require "/items/buildscripts/project42neo-abilities.lua"
 
 function build(directory, config, parameters, level, seed)
 
@@ -18,7 +18,16 @@ function build(directory, config, parameters, level, seed)
   construct(config, "primaryAbility")
   local sequenceDirectoryPath = config.primaryAbility.stanceSequenceDirectory or "/items/buildscripts/project42neo/stanceSequences.config"
   local sequenceDirectory = root.assetJson(sequenceDirectoryPath)
-  local applyStanceSequence = function (sequenceName, attackKey)
+  local compileAnimationScripts = function(scripts)
+    local compiledScripts = {nil}
+    for _, scriptArray in ipairs(scripts) do
+      for _, script in ipairs(scriptArray) do
+        table.insert(compiledScripts, script)
+      end
+    end
+    return compiledScripts
+  end
+  local applyStanceSequence = function (sequenceName, attackKey, sequenceType)
   
     local sequencePath = sequenceDirectory[sequenceName]
     local sequenceConfig = root.assetJson(sequencePath)
@@ -47,25 +56,44 @@ function build(directory, config, parameters, level, seed)
         )
       end
     end
-  
-    construct(config.primaryAbility, "combo", "attacks", sequenceName)
-    config.primaryAbility.combo.attacks[attackKey or sequenceName].sequence = sequenceConfig.sequence
-    config.primaryAbility.combo.attacks[attackKey or sequenceName].attackIndex = sequenceConfig.attackIndex
-      
+    
+    if sequenceType == "sheathing" then
+      construct(config.primaryAbility, "idle")
+      config.primaryAbility.idle.sheathing = sequenceConfig.sequence
+    elseif sequenceType == "unsheathing" then
+      construct(config.primaryAbility, "idle")
+      config.primaryAbility.idle.unsheathing = sequenceConfig.sequence
+    else
+      construct(config.primaryAbility, "combo", "attacks", sequenceName)
+      config.primaryAbility.combo.attacks[attackKey or sequenceName].sequence = sequenceConfig.sequence
+      config.primaryAbility.combo.attacks[attackKey or sequenceName].attackIndex = sequenceConfig.attackIndex  
+    end
   end
 
   if level and not configParameter("fixedLevel", true) then
     parameters.level = level
   end
 
-  setupAbility(config, parameters, "primary")
-  setupAbility(config, parameters, "alt")
+  local primaryAnimationScripts = setupAbility(config, parameters, "primary")
+  local altAnimationScripts = setupAbility(config, parameters, "alt")
+  parameters.animationScripts = compileAnimationScripts({
+    altAnimationScripts,
+    primaryAnimationScripts
+  })
 
   -- SECTION: configure primary ability, expected to be project42neo
+  
+  construct(config, "primaryAbility", "idle")
+  if type(config.primaryAbility.idle.sheathing) == "string" then
+    applyStanceSequence(config.primaryAbility.idle.sheathing, nil, "sheathing")
+  end
+  if type(config.primaryAbility.idle.unsheathing) == "string" then
+    applyStanceSequence(config.primaryAbility.idle.unsheathing, nil, "unsheathing")
+  end
+
   construct(config, "primaryAbility", "combo", "attacks")
   for attackKey, attackConfig in pairs(config.primaryAbility.combo.attacks or {}) do
     if type(attackConfig.sequence) == "string" then
-      sb.logInfo(attackKey .. attackConfig.sequence)
       applyStanceSequence(attackConfig.sequence, attackKey)
     end
   end

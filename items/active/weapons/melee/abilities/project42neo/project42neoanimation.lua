@@ -45,13 +45,23 @@ function update(dt)
     local offset = vec2.add(vec2.add(self.sheathProperties.offset, self.sheathOffset), movementOffset(self.ownerVelocity))
     offset = {offset[1] * activeItemAnimation.ownerFacingDirection(), offset[2] - (self.ownerCrouching and 0.5 or 0)}
     local rotation = util.toRadians(self.sheathProperties.rotation + self.sheathRotation) + movementTilt(self.ownerVelocity)
+
+    local sheathImage = self.sheathProperties.image[self.sheathStatus]
+    if sheathImage then
+      sheathImage = sheathImage .. ((activeItemAnimation.ownerFacingDirection() > 0) and "?flipx" or "") .. self.sheathDirectives
+    else
+      sheathImage = "/assetmissing.png"
+    end
+
+    local sheathLayer = (self.sheathProperties.layer or 0) + activeItemAnimation.ownerFacingDirection()
+
     localAnimator.addDrawable({
-      image = self.sheathProperties.image[self.sheathStatus] .. ((activeItemAnimation.ownerFacingDirection() > 0) and "?flipx" or "") .. self.sheathDirectives,
+      image = sheathImage,
       position = vec2.add(activeItemAnimation.ownerPosition(), offset),
       rotation = rotation * activeItemAnimation.ownerFacingDirection(),
       color = {255,255,255},
       fullbright = false,
-    }, "Player" .. ((activeItemAnimation.ownerFacingDirection() > 0) and "+1" or "-1"))
+    }, "Player" .. (sheathLayer < 0 and "" or "+") .. sheathLayer)
   end
 
 end
