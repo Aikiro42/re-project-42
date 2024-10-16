@@ -1,4 +1,4 @@
-# Overview
+# Ideas guy
 - Weapons are moddable like Project 45
 - base:
 	- katana
